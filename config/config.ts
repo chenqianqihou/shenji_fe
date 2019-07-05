@@ -156,6 +156,19 @@ export default {
               name: 'auth',
               component: './setting/AuthSetting',
             },
+
+            //新建人员，修改人员
+            {
+              path: '/setting/user/edit',
+              name: 'editUser',
+              component: './setting/user/edit',
+            },
+            //人员信息展示
+            {
+              path: '/setting/user/show',
+              name: 'showUser',
+              component: './setting/user/show',
+            },
           ],
         },
         {
