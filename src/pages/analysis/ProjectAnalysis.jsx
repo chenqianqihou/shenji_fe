@@ -1,8 +1,10 @@
+// 项目分析
+
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 
 // eslint-disable-next-line react/prefer-stateless-function
-export default class RoleManager extends Component {
+export default class ProjectAnalysis extends Component {
   // eslint-disable-next-line no-useless-constructor
   constructor(props) {
     super(props);

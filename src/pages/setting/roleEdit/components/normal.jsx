@@ -1,7 +1,7 @@
 //基础信息模块
 import React, { Component } from 'react';
 import { Input, Form } from 'antd';
-import { cardValid } from '../../../../../utils/form';
+import { cardValid } from '../../../../utils/form';
 
 @Form.create()
 export default class NormalField extends Component {

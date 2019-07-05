@@ -4,7 +4,7 @@ import { Form } from 'antd';
 import NormalField from './components/normal';
 
 @Form.create()
-export default class AuthSetting extends Component {
+export default class RoleEdit extends Component {
   // eslint-disable-next-line no-useless-constructor
 
   render() {

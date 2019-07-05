@@ -16,8 +16,6 @@ import { formatMessage } from 'umi-plugin-react/locale';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { ConnectState, Dispatch } from '@/models/connect';
-import { isAntDesignPro } from '@/utils/utils';
-import logo from '../assets/logo.svg';
 
 // addLocaleData(enLocaleData)
 export interface BasicLayoutProps extends ProLayoutProps {
@@ -49,15 +47,15 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
   return (
     <>
       <div
-        style={{
-          padding: '0px 24px 24px',
-          textAlign: 'center',
-          fontSize: '16px',
-          color: '#c1c1c1',
-        }}
-      >
-        审计人力资源管理系统
-      </div>
+      style={{
+        padding: '0px 24px 24px',
+        textAlign: 'center',
+        fontSize: '16px',
+        color: '#c1c1c1',
+      }}
+    >
+      审计资源管理平台
+    </div>
     </>
   );
 };
@@ -91,7 +89,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
 
   return (
     <ProLayout
-      logo={logo}
+      logo={null}
       onCollapse={handleMenuCollapse}
       menuItemRender={(menuItemProps, defaultDom) => {
         if (menuItemProps.isUrl) {
@@ -99,7 +97,9 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
         }
         return <Link to={menuItemProps.path}>{defaultDom}</Link>;
       }}
-      breadcrumbRender={(routers = []) => [
+      breadcrumbRender={(routers = []) => {
+        console.log('aaaa',routers,)
+        return [
         {
           path: '/',
           breadcrumbName: formatMessage({
@@ -107,8 +107,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
             defaultMessage: 'Home',
           }),
         },
-        ...routers,
-      ]}
+        ...routers, 
+      ]}}
       footerRender={footerRender}
       menuDataRender={menuDataRender}
       formatMessage={formatMessage}
