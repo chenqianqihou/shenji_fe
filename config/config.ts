@@ -164,12 +164,12 @@ export default {
                   name: 'edit',
                   component: './setting/roleEdit',
                 },
-                // //人员信息展示
-                // {
-                //   path: '/setting/role/show',
-                //   name: 'show',
-                //   component: './setting/role/show',
-                // },
+                //人员信息展示
+                {
+                  path: '/setting/roleShow',
+                  name: 'show',
+                  component: './setting/roleShow',
+                },
               ],
             },
             {
