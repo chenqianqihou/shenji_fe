@@ -54,7 +54,7 @@ export default {
   menu: {
     locale: true,
   },
-  title: '审计资源管理系统',
+  title: '审计资源管理平台',
   pwa: false,
   iconfontUrl: '',
 } as DefaultSettings;

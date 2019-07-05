@@ -17,7 +17,6 @@ import { formatMessage } from 'umi-plugin-react/locale';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { ConnectState, Dispatch } from '@/models/connect';
-import logo from '../assets/logo.svg';
 
 export interface BasicLayoutProps extends ProLayoutProps {
   breadcrumbNameMap: {
@@ -55,7 +54,7 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
         color: '#c1c1c1',
       }}
     >
-      审计资源管理系统
+      审计资源管理平台
     </div>
     </>
   );

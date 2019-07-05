@@ -54,7 +54,7 @@ export default {
   'menu.setting.role': '人员配置',
   'menu.setting.assign': '人员分配',
   'menu.setting.check': '审核管理',
-  'menu.index': '控制台',
+  'menu.index': 'Dashboard',
   'menu.result': '成果管理',
   'menu.analysis': '审计分析',
   'menu.analysis.project': '项目分析',
