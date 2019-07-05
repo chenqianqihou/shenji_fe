@@ -1,17 +1,16 @@
-import { Alert, Checkbox, Icon } from 'antd';
+import { Alert, Checkbox } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
 
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { Dispatch } from 'redux';
 import { FormComponentProps } from 'antd/es/form';
-import Link from 'umi/link';
 import { connect } from 'dva';
 import { StateType } from './model';
 import LoginComponents from './components/Login';
 import styles from './style.less';
 
-const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
+const { Tab, UserName, Password, Submit } = LoginComponents;
 
 interface LoginProps {
   dispatch: Dispatch<any>;
@@ -23,10 +22,8 @@ interface LoginState {
   autoLogin: boolean;
 }
 export interface FromDataType {
-  userName: string;
-  password: string;
-  mobile: string;
-  captcha: string;
+  account: string;
+  pwd: string;
 }
 
 @connect(
@@ -77,25 +74,25 @@ class Login extends Component<LoginProps, LoginState> {
     this.setState({ type });
   };
 
-  onGetCaptcha = () =>
-    new Promise((resolve, reject) => {
-      if (!this.loginForm) {
-        return;
-      }
-      this.loginForm.validateFields(['mobile'], {}, (err: any, values: FromDataType) => {
-        if (err) {
-          reject(err);
-        } else {
-          const { dispatch } = this.props;
-          ((dispatch({
-            type: 'userLogin/getCaptcha',
-            payload: values.mobile,
-          }) as unknown) as Promise<any>)
-            .then(resolve)
-            .catch(reject);
-        }
-      });
-    });
+  // onGetCaptcha = () =>
+  //   new Promise((resolve, reject) => {
+  //     if (!this.loginForm) {
+  //       return;
+  //     }
+  //     this.loginForm.validateFields(['mobile'], {}, (err: any, values: FromDataType) => {
+  //       if (err) {
+  //         reject(err);
+  //       } else {
+  //         const { dispatch } = this.props;
+  //         ((dispatch({
+  //           type: 'userLogin/getCaptcha',
+  //           payload: values.mobile,
+  //         }) as unknown) as Promise<any>)
+  //           .then(resolve)
+  //           .catch(reject);
+  //       }
+  //     });
+  //   });
 
   renderMessage = (content: string) => (
     <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />
@@ -123,7 +120,7 @@ class Login extends Component<LoginProps, LoginState> {
                 formatMessage({ id: 'user-login.login.message-invalid-credentials' }),
               )}
             <UserName
-              name="userName"
+              name="account"
               placeholder={`${formatMessage({ id: 'user-login.login.userName' })}`}
               rules={[
                 {
@@ -133,7 +130,7 @@ class Login extends Component<LoginProps, LoginState> {
               ]}
             />
             <Password
-              name="password"
+              name="pwd"
               placeholder={`${formatMessage({ id: 'user-login.login.password' })}`}
               rules={[
                 {
