@@ -4,7 +4,6 @@ import defaultSettings from './defaultSettings';
 // https://umijs.org/config/
 import slash from 'slash2';
 import webpackPlugin from './plugin.config';
-
 const { pwa, primaryColor } = defaultSettings;
 
 // preview.pro.ant.design only do not use in your production ;
@@ -150,24 +149,25 @@ export default {
               path: '/setting/role',
               name: 'role',
               component: './setting/RoleSetting',
+              routes: [
+                //新建人员，修改人员
+                {
+                  path: '/setting/role/edit',
+                  name: '人员信息录入',
+                  component: './setting/role/edit',
+                },
+                //人员信息展示
+                {
+                  path: '/setting/role/show',
+                  name: '人员信息展示',
+                  component: './setting/role/show',
+                },
+              ],
             },
             {
               path: '/setting/auth',
               name: 'auth',
               component: './setting/AuthSetting',
-            },
-
-            //新建人员，修改人员
-            {
-              path: '/setting/user/edit',
-              name: 'editUser',
-              component: './setting/user/edit',
-            },
-            //人员信息展示
-            {
-              path: '/setting/user/show',
-              name: 'showUser',
-              component: './setting/user/show',
             },
           ],
         },
