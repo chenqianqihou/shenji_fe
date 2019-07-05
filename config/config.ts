@@ -157,20 +157,6 @@ export default {
               path: '/setting/user',
               name: 'role',
               component: './setting/RoleSetting',
-              routes: [
-                //新建人员，修改人员
-                {
-                  path: '/setting/roleEdit',
-                  name: 'edit',
-                  component: './setting/roleEdit',
-                },
-                //人员信息展示
-                {
-                  path: '/setting/roleShow',
-                  name: 'show',
-                  component: './setting/roleShow',
-                },
-              ],
             },
             {
               path: '/setting/assign',
@@ -192,7 +178,18 @@ export default {
               name: 'check',
               component: './setting/CheckManage',
             },
-            
+            //新建人员，修改人员
+            {
+              path: '/setting/roleEdit',
+              name: 'roleEdit',
+              component: './setting/roleEdit',
+            },
+            //人员信息展示
+            {
+              path: '/setting/roleShow',
+              name: 'roleShow',
+              component: './setting/roleShow',
+            },
           ],
         },
         {
@@ -254,7 +251,7 @@ export default {
   chainWebpack: webpackPlugin,
   proxy: {
     '/api/': {
-      target: 'http://39.106.225.194/',
+      target: 'http://39.106.225.194:8090/',
       changeOrigin: true,
       pathRewrite: { '^/server': '' },
     },
