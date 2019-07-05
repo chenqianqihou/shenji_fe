@@ -119,17 +119,35 @@ export default {
           component: './index/Index',
         },
         {
-          path: '/role',
-          // 角色管理
-          name: 'role',
-          icon: 'user',
-          component: './role/RoleManager',
-        },
-        {
           path: '/project',
           name: 'project',
           icon: 'project',
-          component: './project/ProjectManager',
+          component: './project/ProjectManage',
+        },
+        {
+          path: '/result',
+          // 角色管理
+          name: 'result',
+          icon: 'profile',
+          component: './result/ResultManage',
+        },
+        {
+          path: '/analysis',
+          // 角色管理
+          name: 'analysis',
+          icon: 'area-chart',
+          routes: [
+            {
+              path: '/analysis/project',
+              name: 'project',
+              component: './analysis/ProjectAnalysis',
+            },
+            {
+              path: '/analysis/user',
+              name: 'role',
+              component: './analysis/RoleAnalysis',
+            },
+          ]
         },
         {
           path: '/setting',
@@ -137,25 +155,31 @@ export default {
           icon: 'setting',
           routes: [
             {
-              path: '/setting/org',
-              name: 'org',
-              component: './setting/OrgSetting',
-            },
-            {
               path: '/setting/user',
-              name: 'user',
-              component: './setting/UserSetting',
-            },
-            {
-              path: '/setting/role',
               name: 'role',
               component: './setting/RoleSetting',
+            },
+            {
+              path: '/setting/assign',
+              name: 'assign',
+              component: './setting/RoleAssign',
             },
             {
               path: '/setting/auth',
               name: 'auth',
               component: './setting/AuthSetting',
             },
+            {
+              path: '/setting/org',
+              name: 'org',
+              component: './setting/OrgSetting',
+            },
+            {
+              path: '/setting/check',
+              name: 'check',
+              component: './setting/CheckManage',
+            },
+            
           ],
         },
         {
