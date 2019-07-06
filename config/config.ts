@@ -94,7 +94,7 @@ export default {
       component: '../layouts/UserLayout',
       routes: [
         { path: '/user', redirect: '/user/login' },
-        { path: '/user/login', name: 'login', component: './user/Login' },
+        { path: '/user/login', name: 'login', component: './user/login' },
         // { path: '/user/register', name: 'register', component: './User/Register' },
         // {
         //   path: '/user/register-result',
