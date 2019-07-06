@@ -94,7 +94,7 @@ export default {
       component: '../layouts/UserLayout',
       routes: [
         { path: '/user', redirect: '/user/login' },
-        { path: '/user/login', name: 'login', component: './User/Login' },
+        { path: '/user/login', name: 'login', component: './user/Login' },
         // { path: '/user/register', name: 'register', component: './User/Register' },
         // {
         //   path: '/user/register-result',
@@ -241,7 +241,7 @@ export default {
   chainWebpack: webpackPlugin,
   proxy: {
     '/api/': {
-      target: 'http://39.106.225.194/',
+      target: 'http://39.106.225.194:8090/',
       changeOrigin: true,
       pathRewrite: { '^/server': '' },
     },
