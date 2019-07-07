@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 
-export async function userSelect(): Promise<any> {
+export async function getUserConfigSelect(): Promise<any> {
   return request('/api/user/selectconfig');
 }
 
@@ -48,6 +48,17 @@ interface queryUserParam {
 }
 export async function queryUser(params: queryUserParam): Promise<any> {
     return request('/api/user/list',{
+        method: 'POST',
+        data: params
+    }) 
+}
+
+interface updateUserRoleParam {
+    pid: string,
+    role: string
+}
+export async function updateUserRole(params: updateUserRoleParam): Promise<any> {
+    return request('/api/user/updaterole',{
         method: 'POST',
         data: params
     }) 

@@ -98,7 +98,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
         return <Link to={menuItemProps.path}>{defaultDom}</Link>;
       }}
       breadcrumbRender={(routers = []) => {
-        console.log('aaaa',routers,)
         return [
         {
           path: '/',
