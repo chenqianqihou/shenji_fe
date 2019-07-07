@@ -2,6 +2,7 @@
 
 //是否是正确的身份证号
 export const cardValid = function(value) {
+  if(!value) return ''
   var ex = /^((1[1-5])|(2[1-3])|(3[1-7])|(4[1-6])|(5[0-4])|(6[1-5])|71|(8[12])|91)\d{4}(19|2[0-9])((\d{2}(0[13-9]|1[012])(0[1-9]|[12]\d|30))|(\d{2}(0[13578]|1[02])31)|(\d{2}02(0[1-9]|1\d|2[0-8]))|(([13579][26]|[2468][048]|0[48])0229))\d{3}(\d|X|x)?$/;
   var pattern = new RegExp(ex);
   if (!pattern.test(value)) {
@@ -26,11 +27,13 @@ export const cardValid = function(value) {
 };
 
 export const  UserId2Birthday = (UUserCard)=>{ 
+  if(!UUserCard) return ''
   //获取出生日期 
   return UUserCard.substring(6, 10) + "-" + UUserCard.substring(10, 12) + "-" + UUserCard.substring(12, 14); 
 } 
 
 export const UserId2Age = (UUserCard)=>{
+  if(!UUserCard) return ''
   //获取年龄 
   var myDate = new Date(); 
   var month = myDate.getMonth() + 1; 
@@ -43,6 +46,7 @@ export const UserId2Age = (UUserCard)=>{
 }
 
 export const UserId2Sex = (UUserCard)=>{
+  if(!UUserCard) return ''
 //获取性别 
   if (parseInt(UUserCard.substr(16, 1)) % 2 == 1) { 
     return 1

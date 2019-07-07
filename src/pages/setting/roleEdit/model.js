@@ -3,7 +3,6 @@ import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
 import {Modal} from 'antd'
 import { getUserRoleOptions,getProvincialOptions,getFormAdd,getOrganization ,getFormData} from './service';
-import { getPageQuery, setToken } from '../../../utils/utils';
 
 const Model = {
   namespace: 'roleEdit',
@@ -37,6 +36,7 @@ const Model = {
         },
       });
     },
+
     *submitForm({ payload }, { call, put }) {
       const response = yield call(getFormAdd, payload)
       if(response.error.returnCode === 0){

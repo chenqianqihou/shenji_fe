@@ -27,8 +27,9 @@ export default class RoleEdit extends Component {
   componentDidMount(){
     const { account } = query
     const { dispatch } = this.props;
+
     dispatch({
-      type: 'roleEdit/getOptions',
+      type: 'roleShow/getOptions',
     });
     if(account){
       dispatch({
