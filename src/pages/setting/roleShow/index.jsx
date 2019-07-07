@@ -25,7 +25,7 @@ export default class RoleShow extends Component {
 
 
   convertData = ()=>{
-    const {roleShow:{formData={},options,provincial}} = this.props
+    const {roleShow:{formData={},options,provincial,organization}} = this.props
     const data = [
       {
         title:'个人信息',
@@ -115,6 +115,18 @@ export default class RoleShow extends Component {
               return roleType[formData.type] || ''
             })()
           },
+          {
+            title:'所属机构',
+            value:(()=>{
+              let value = ''
+              organization.forEach(item=>{
+                if(item.id == formData.organization){
+                  value = item.name
+                }
+              })
+              return value
+            })()
+          }
         ].concat(this.renderConvertDeficitData())
       },
       {

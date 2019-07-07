@@ -16,10 +16,13 @@ export async function getFormAdd(params){
 }
 
 export async function getOrganization(params){
-  return request('/api/organization/list')
+  return request('/api/organization/search?start=0&length=-1&type='+params.type)
 }
 
 export async function getFormData(params){
-  return request('/api/user/info?account='+params.account)
+  return request('/api/user/info',{
+    method: 'POST',
+    data: params
+  })
 }
 
