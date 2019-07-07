@@ -13,11 +13,11 @@ import React, { useEffect } from 'react';
 import Link from 'umi/link';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
-
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { ConnectState, Dispatch } from '@/models/connect';
 
+// addLocaleData(enLocaleData)
 export interface BasicLayoutProps extends ProLayoutProps {
   breadcrumbNameMap: {
     [path: string]: MenuDataItem;
@@ -97,7 +97,9 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
         }
         return <Link to={menuItemProps.path}>{defaultDom}</Link>;
       }}
-      breadcrumbRender={(routers = []) => [
+      breadcrumbRender={(routers = []) => {
+        console.log('aaaa',routers,)
+        return [
         {
           path: '/',
           breadcrumbName: formatMessage({
@@ -105,8 +107,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
             defaultMessage: 'Home',
           }),
         },
-        ...routers,
-      ]}
+        ...routers, 
+      ]}}
       footerRender={footerRender}
       menuDataRender={menuDataRender}
       formatMessage={formatMessage}

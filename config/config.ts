@@ -4,7 +4,6 @@ import defaultSettings from './defaultSettings';
 // https://umijs.org/config/
 import slash from 'slash2';
 import webpackPlugin from './plugin.config';
-
 const { pwa, primaryColor } = defaultSettings;
 
 // preview.pro.ant.design only do not use in your production ;
@@ -179,7 +178,18 @@ export default {
               name: 'check',
               component: './setting/CheckManage',
             },
-            
+            //新建人员，修改人员
+            {
+              path: '/setting/roleEdit',
+              name: 'roleEdit',
+              component: './setting/roleEdit',
+            },
+            //人员信息展示
+            {
+              path: '/setting/roleShow',
+              name: 'roleShow',
+              component: './setting/roleShow',
+            },
           ],
         },
         {
@@ -241,7 +251,11 @@ export default {
   chainWebpack: webpackPlugin,
   proxy: {
     '/api/': {
+<<<<<<< HEAD
       target: 'http://39.106.225.194:8090/',
+=======
+      target: 'http://39.106.225.194:8080/',
+>>>>>>> zhaoyi_dev
       changeOrigin: true,
       pathRewrite: { '^/server': '' },
     },
