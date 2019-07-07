@@ -40,7 +40,7 @@ export default class RoleShow extends Component {
           },
           {
             title:'性别',
-            value: UserId2Sex(formData.cardid) || ''
+            value: UserId2Sex(formData.cardid) === 1?'男':'女'
           },
           {
             title:'出生年月',
