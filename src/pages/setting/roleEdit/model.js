@@ -4,7 +4,6 @@ import { routerRedux } from 'dva/router';
 import {Modal} from 'antd'
 import { getUserRoleOptions,getProvincialOptions,getFormAdd,getOrganization ,getFormData} from './service';
 import { getUrlParams } from '../../../utils/url';
-const query = getUrlParams()
 
 const Model = {
   namespace: 'roleEdit',
@@ -18,11 +17,10 @@ const Model = {
 
   effects: {
     *getOptions({ payload }, { call, put }) {
+      const query = getUrlParams()
       const { account } = query
-      console.log('getOptions',account)
       const response = yield call(getUserRoleOptions, payload)
       const provincialResponse = yield call(getProvincialOptions,payload)
-      console.log('getOptions',account)
       if(account){
         const formData = yield call(getFormData, {account:account})
         const organization = yield call(getOrganization,{type:formData.data.type})

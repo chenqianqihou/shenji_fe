@@ -33,7 +33,6 @@ export default class RoleEdit extends Component {
   }
 
   componentWillReceiveProps(nextProps){
-    console.log('componentWillReceiveProps')
     this.setState({
       organizationFilter:nextProps.roleEdit.organization,
       roleType:nextProps.roleEdit.formData.type || '',
