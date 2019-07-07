@@ -2,12 +2,13 @@
 
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message } from 'antd';
+import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message, Select } from 'antd';
 import router from 'umi/router';
-import { getOrgUsers, getOrgList, resetPwd, deleteUsers, queryUser } from '../../services/setting';
+import { getOrgUsers, getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
 
 const { TreeNode } = Tree;
 const { Content, Sider } = Layout;
+const { Option } = Select;
 const treeMapType = {
   1: '中介机构',
   2: '审计机关',
@@ -24,6 +25,10 @@ export default class RoleSetting extends Component {
       selectedItems: [],
       selectedOrgId: -1,
       searchInputValue: '',
+      assignModalShow: false,
+      assignRoleList: [],
+      assignRoleMap: {},
+      assignRoleSelectPid: '',
     };
   }
 
@@ -37,13 +42,13 @@ export default class RoleSetting extends Component {
 
   // 树的最外层 三个类型
   formatOrgListTreeOuter = list =>
-  <Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onTreeNodeSelect}>
-    {list.map(v => <TreeNode title={treeMapType[v.type]} key={v.type} type="parent">
-      {
-        // eslint-disable-next-line max-len
-        Array.isArray(v.list) ? v.list.map(value => this.geneChildTreeNode(value)) : this.geneParentTreeNode(v.list)})
-    </TreeNode>)}
-  </Tree>
+    <Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onTreeNodeSelect}>
+      {list.map(v => <TreeNode title={treeMapType[v.type]} key={v.type} type="parent">
+        {
+          // eslint-disable-next-line max-len
+          Array.isArray(v.list) ? v.list.map(value => this.geneChildTreeNode(value)) : this.geneParentTreeNode(v.list)})
+      </TreeNode>)}
+    </Tree>
 
   // 构造树的父亲节点
   geneParentTreeNode = data => {
@@ -95,7 +100,31 @@ export default class RoleSetting extends Component {
   }
 
   handleItemAssign = e => {
-    console.log(e);
+    const { pid } = e;
+    const { assignRoleList } = this.state;
+    if (assignRoleList.length === 0) {
+      getUserConfigSelect().then(res => {
+        if (res.error.returnCode === 0) {
+          this.setState({ assignRoleMap: res.data.role, assignRoleList: Object.keys(res.data.role) });
+        }
+      });
+    }
+    this.setState({ assignModalShow: true, assignRoleSelectPid: pid });
+  }
+
+  handleAssignModalSubmit = () => {
+    const { assignRoleSelectPid, assignRoleSelectItem } = this.state;
+    updateUserRole({
+      pid: assignRoleSelectPid,
+      role: assignRoleSelectItem.toString(),
+    }).then(res => {
+      if (res.error.returnCode === 0) {
+        message.success('操作成功');
+      } else {
+        message.error(res.error.returnUserMessage || '操作失败');
+      }
+      this.setState({ assignModalShow: false });
+    });
   }
 
   handleItemResetPwd = e => {
@@ -181,7 +210,7 @@ export default class RoleSetting extends Component {
           <a onClick={() => this.handleItemAssign(record)}>分配角色</a>
         </span> },
     ];
-    const { tableData, orgListTree } = this.state;
+    const { tableData, orgListTree, assignRoleList, assignRoleMap } = this.state;
 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
@@ -234,6 +263,24 @@ export default class RoleSetting extends Component {
             </Row>
           </Col>
         </Row>
+        <Modal
+          title="分配角色"
+          visible={this.state.assignModalShow}
+          onCancel={() => this.setState({ assignModalShow: false })}
+          onOk={this.handleAssignModalSubmit}
+        >
+          <Select
+            mode="multiple"
+            placeholder="请选择角色"
+            onChange={e => this.setState({ assignRoleSelectItem: e })}
+            style={{ width: '100%' }}
+          >
+            {
+              assignRoleList.length > 0 && assignRoleList.map(v => <Option key={v}>{assignRoleMap[v]}</Option>)
+
+            }
+          </Select>
+        </Modal>
         </Content>
       </div>
     );
