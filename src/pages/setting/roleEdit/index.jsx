@@ -43,6 +43,19 @@ export default class RoleEdit extends Component {
     }
   }
 
+  handleChangeProvincial = (value,index)=>{
+    const { form:{getFieldValue,setFieldsValue} } = this.props;
+    const newProvincial = [].concat(getFieldValue('provincial_city'))
+    newProvincial[index] = value
+
+    for(let i = index+1;i<3;i++){
+      newProvincial[i] = ''
+    }
+    setFieldsValue({
+      provincial_city: newProvincial,
+    })
+  }
+
   handleChangeRoleType = (value)=>{
     this.setState({
       roleType:value
@@ -60,6 +73,8 @@ export default class RoleEdit extends Component {
     newState[props] = this.state[props] - 1
     this.setState(newState)
   }
+
+  
 
   handleSubmit = e => {
     e.preventDefault();
@@ -82,19 +97,30 @@ export default class RoleEdit extends Component {
 【专业技术资质】与【获取专业技术资质日期】属联动关系、添加一个“专业技术资质”便同步增加“获取专业技术资质日期”选框*/
   renderProfessionTechnical(){
     const {professionTechnicalNum} = this.state
-    const { form:{getFieldDecorator},roleEdit:{options} } = this.props;
+    const { form:{getFieldDecorator,getFieldValue},roleEdit:{options} } = this.props;
 
     const dom = []
     for(let i = 0;i<professionTechnicalNum;i++){
       dom.push(
         <div className={styles["add_fields"]}>
-          <Form.Item label={`专业技术资质${i}`}>
-            {getFieldDecorator(`beginJobTime_${i}`, {
+          <Form.Item label={`专业技术资质${i+1}`}>
+            {getFieldDecorator(`abcde_${i}`, {
             })( <Input placeholder="请输入专业技术资质" />)}
           </Form.Item>
 
-          <Form.Item label="获取专业技术资质日期">
-            {getFieldDecorator(`beginJobTime_${i}`, {
+          <Form.Item label="获取专业技术资质日期" required>
+            {getFieldDecorator(`abcdefg_${i}`, {
+              rules:[
+                {
+                  validator: (rule, value, callback) => {
+                    console.log('aaaaa',getFieldValue(`abcde_${i}`),value && getFieldValue(`beginJobTime_${i}`))
+                    if (!value && getFieldValue(`abcde_${i}`)) {
+                      callback('请选择获取专业技术资质日期!');
+                    }
+                    callback();
+                  },
+                }
+              ]
             })( <DatePicker />)}
           </Form.Item>
           {
@@ -118,7 +144,7 @@ export default class RoleEdit extends Component {
     for(let i = 0;i<trainingContentNum;i++){
       dom.push(
         <div className={styles["add_fields"]}>
-          <Form.Item label={`业务培训情况${i}`}>
+          <Form.Item label={i === 0?`业务培训情况`:' '}>
             {getFieldDecorator(`beginJobTime_${i}`, {
             })( <Input placeholder="请输入业务培训情况" />)}
           </Form.Item>
@@ -190,6 +216,8 @@ export default class RoleEdit extends Component {
               )}
             </Form.Item>
 
+            {this.renderTrainingContent()}
+
             <Form.Item label="参加工作年月" hasFeedback>
               {getFieldDecorator('jobTime', {
               })( <DatePicker />)}
@@ -200,7 +228,7 @@ export default class RoleEdit extends Component {
               })( <DatePicker />)}
             </Form.Item>
             
-            {this.renderTrainingContent()}
+            
           </div>
         )
       //内审机构
@@ -217,15 +245,19 @@ export default class RoleEdit extends Component {
             </Form.Item>
 
             <Form.Item label="开始从业日期" hasFeedback>
-              {getFieldDecorator('beginJobTime', 
-                { type: 'object',required: true, message: '请选择开始从业日期!' },
-              )( <DatePicker />)}
+              {getFieldDecorator('beginJobTime', {
+                rules:[
+                  { type: 'object',required: true, message: '请选择开始从业日期!' },
+                ]
+              })( <DatePicker />)}
             </Form.Item>
 
             <Form.Item label="专业特长" hasFeedback>
-              {getFieldDecorator('positiontext', 
-                { required: true, message: '请输入专业特长!' },
-              )(
+              {getFieldDecorator('positiontext', {
+                rules:[
+                  { type: 'object',required: true, message: '请选择开始从业日期!' },
+                ]
+              })(
                 <Input placeholder="请输入专业特长" />
               )}
             </Form.Item>
@@ -259,8 +291,10 @@ export default class RoleEdit extends Component {
       wrapperCol: { span: 14 },
     }
     const {disabled} = this.state
-    const { form:{getFieldDecorator},roleEdit:{options} } = this.props;
-    console.log('options',options)
+    const { form:{getFieldDecorator,getFieldValue},roleEdit:{options,provincial} } = this.props;
+    const provincialOption = provincial['100000'] || {}
+
+    console.log('options',options,provincial)
     return (
       <div className={styles["role_manager_edit"]}>
         <PageHeaderWrapper />
@@ -301,7 +335,7 @@ export default class RoleEdit extends Component {
             )}
           </Form.Item>
 
-          <Form.Item label="出生年月">
+          <Form.Item label="出生年月" hasFeedback>
             {getFieldDecorator('birthday', {
               rules: [
                 { type: 'object',required: true, message: '请选择出生年月!' },
@@ -401,6 +435,40 @@ export default class RoleEdit extends Component {
           </Form.Item>
 
           <div className={styles["title"]}>职能信息</div>
+          
+          <Form.Item label="所属省市区" required>
+            {getFieldDecorator('provincial_city', {
+              initialValue:['','',''],
+              rules: [
+                {
+                  validator: (rule, value, callback) => {
+                    
+                    for(let i = 0 ;i<3;i++){
+                      if (!value[i]) {
+                        callback('请选择所属省市区!');
+                        break;
+                      }
+                    }     
+                    callback();
+                  },
+                },
+              ],
+            })(
+              <div>
+                <Select placeholder="请选择" value={getFieldValue('provincial_city')[0]} onChange={(value)=>this.handleChangeProvincial(value,0)}>
+                  {this.renderSelectOption(provincialOption)}
+                </Select>
+
+                <Select placeholder="请选择" value={getFieldValue('provincial_city')[1]} onChange={(value)=>this.handleChangeProvincial(value,1)}>
+                  {this.renderSelectOption(provincial[getFieldValue('provincial_city')[0]] || [])}
+                </Select>
+
+                <Select placeholder="请选择" value={getFieldValue('provincial_city')[2]} onChange={(value)=>this.handleChangeProvincial(value,2)}>
+                  {this.renderSelectOption(provincial[getFieldValue('provincial_city')[1]] || [])}
+                </Select>
+              </div>
+            )}
+          </Form.Item>
 
           <Form.Item label="能力等级" hasFeedback>
             {getFieldDecorator('level', {
@@ -422,19 +490,35 @@ export default class RoleEdit extends Component {
               </Select>
             )}
           </Form.Item>
-        {/* 所属省市区（必填）：
-      1.下拉框选择
-      2.下拉内容：依据客户提供列表（审计人力资源系统数据采集表v4）
-人员类型（必填）：
-      1.下拉框选择
-      2.下拉内容：审计机关、内审机构、中介机构 */}
-        {this.renderDeficitFileds()}
 
-        <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
-          <Button type="primary" htmlType="submit">
-            提交
-          </Button>
-        </Form.Item>
+          {this.renderDeficitFileds()}
+
+          <div className={styles["title"]}>其他信息</div>
+
+          <Form.Item label="备注" hasFeedback>
+            {getFieldDecorator('aaa', {
+            })(
+              <TextArea rows={4} maxlength={200} placeholder="请输入备注,最多200个字"/>
+            )}
+          </Form.Item>
+
+          <Form.Item label="角色配置" hasFeedback>
+            {getFieldDecorator('bbb', {
+              rules: [
+                { required: true, message: '请选择角色配置!' },
+              ],
+            })(
+              <Select placeholder="请选择角色配置"> 
+                {this.renderSelectOption(options.level)}
+              </Select>
+            )}
+          </Form.Item>
+
+          <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
+            <Button type="primary" htmlType="submit">
+              提交
+            </Button>
+          </Form.Item>
         </Form>
       </div>
     );

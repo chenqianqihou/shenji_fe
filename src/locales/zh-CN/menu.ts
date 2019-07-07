@@ -53,7 +53,7 @@ export default {
   'menu.setting.auth': '权限配置',
   'menu.setting.role': '人员配置',
   'menu.setting.roleEdit':'人员信息录入',
-  'menu.setting.roleShow':'人员信息展示',
+  'menu.setting.roleShow':'人员基本信息',
   'menu.setting.assign': '人员分配',
   'menu.setting.check': '审核管理',
   'menu.index': 'Dashboard',
