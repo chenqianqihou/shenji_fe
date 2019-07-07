@@ -4,11 +4,10 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Input, Form, Select,DatePicker ,InputNumber,Button} from 'antd';
 import moment from 'moment'
 import { cardValid, UserId2Birthday,UserId2Age,UserId2Sex } from '../../../utils/form';
-import { getUrlParams } from '../../../utils/url';
 import styles from './index.less';
 
 const TextArea = Input.TextArea
-const query = getUrlParams()
+
 // eslint-disable-next-line react/prefer-stateless-function
 @Form.create()
 @connect(({roleEdit}) => ({
@@ -16,29 +15,27 @@ const query = getUrlParams()
 }))
 export default class RoleEdit extends Component {
   state= {
-    disabled:false,
-    roleType:'',
+    disabled:this.props.roleEdit.formData.cardid?true:false,
+    roleType:this.props.roleEdit.formData.type || '',
     professionTechnicalNum:1,
     trainingContentNum:1,
     qualificationState:[],
-    trainState:[]
+    trainState:[],
+    organizationFilter:this.props.roleEdit.organization
   }
   
   componentDidMount(){
-    const { account } = query
     const { dispatch } = this.props;
 
     dispatch({
-      type: 'roleShow/getOptions',
+      type: 'roleEdit/getOptions',
     });
-    if(account){
-      dispatch({
-        type: 'roleEdit/getFormData',
-        payload:{
-          account:account
-        }
-      });
-    }
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.setState({
+      organizationFilter:nextProps.roleEdit.organization
+    })
   }
 
   inputUserIDNum = (e)=>{
@@ -57,6 +54,23 @@ export default class RoleEdit extends Component {
     }
   }
 
+  //模糊查询
+  handleSearchOrganization = value => {
+    if(value === ''){
+      this.setState({
+        organizationFilter:this.props.roleEdit.organization
+      })
+    }
+    else{
+      const newList = this.props.roleEdit.organization.filter(item=>{
+        return item.name && item.name.includes(value)
+      })
+      this.setState({
+        organizationFilter:newList
+      })
+    }
+  }
+
   handleChangeProvincial = (value,index)=>{
     const { form:{getFieldValue,setFieldsValue} } = this.props;
     const newProvincial = [].concat(getFieldValue('location'))
@@ -71,8 +85,21 @@ export default class RoleEdit extends Component {
   }
 
   handleChangeRoleType = (value)=>{
+    const { dispatch } = this.props
+
     this.setState({
       roleType:value
+    })
+
+    this.props.form.setFieldsValue({
+      organization:''
+    })
+
+    dispatch({
+      type: 'roleEdit/getOrganization',
+      payload:{
+        type:value
+      }
     })
   }
 
@@ -106,7 +133,6 @@ export default class RoleEdit extends Component {
         if(qualificationState.length) sendValues.qualification = qualificationState
 
 
-        console.log('sendValues',sendValues)
         dispatch({
           type: 'roleEdit/submitForm',
           payload:{
@@ -120,7 +146,7 @@ export default class RoleEdit extends Component {
   renderSelectOption(options={}){
     let dom = []
     Object.keys(options).forEach(key=>{
-      dom.push(<Select.Option value={parseInt(key)}>{options[key]}</Select.Option>)
+      dom.push(<Select.Option value={key}>{options[key]}</Select.Option>)
     })
     return dom
   }
@@ -205,7 +231,6 @@ export default class RoleEdit extends Component {
       
       const newTrain = [].concat(trainState)
       newTrain[index] = e.target.value
-      console.log('index',index,newTrain,newTrain[index])
       this.setState({
         trainState:newTrain
       })
@@ -232,7 +257,7 @@ export default class RoleEdit extends Component {
 
   renderDeficitFileds(){
     const { roleType } = this.state
-    const { form:{getFieldDecorator},roleEdit:{options,formData} } = this.props;
+    const { form:{getFieldDecorator},roleEdit:{options,formData,organization} } = this.props;
     switch(parseInt(roleType)){
       //审计机关
       case 1:
@@ -371,10 +396,11 @@ export default class RoleEdit extends Component {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
-    const {disabled} = this.state
+    const {disabled,organizationFilter} = this.state
     const { form:{getFieldDecorator,getFieldValue},roleEdit:{options,provincial,formData} } = this.props;
     const provincialOption = provincial['100000'] || {}
 
+    console.log('aaaa',organizationFilter)
     return (
       <div className={styles["role_manager_edit"]}>
         <PageHeaderWrapper />
@@ -406,7 +432,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="性别" hasFeedback>
             {getFieldDecorator('sex', {
-              initialValue:formData.sex,
+              initialValue: UserId2Sex(formData.cardid || ''),
               rules: [
                 { required: true, message: '请选择性别!' },
               ],
@@ -420,7 +446,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="出生年月" hasFeedback>
             {getFieldDecorator('birthday', {
-              initialValue:formData.birthday?moment(formData.birthday):null,
+              initialValue:formData.cardid?moment(UserId2Birthday(formData.cardid)):null,
               rules: [
                 { type: 'object',required: true, message: '请选择出生年月!' },
               ],
@@ -431,7 +457,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="年龄" hasFeedback>
             {getFieldDecorator('age', {
-              initialValue:formData.age,
+              initialValue:UserId2Age(formData.cardid || ''),
               rules: [{ required: true, message: '请输入年龄!' }],
             })(
               <Input placeholder="请输入年龄" disabled={disabled}/>
@@ -552,11 +578,11 @@ export default class RoleEdit extends Component {
                 </Select>
 
                 <Select placeholder="请选择" value={getFieldValue('location')[1]} onChange={(value)=>this.handleChangeProvincial(value,1)}>
-                  {this.renderSelectOption(provincial[getFieldValue('location')[0]] || [])}
+                  {this.renderSelectOption(provincial[getFieldValue('location')[0]] || {})}
                 </Select>
 
                 <Select placeholder="请选择" value={getFieldValue('location')[2]} onChange={(value)=>this.handleChangeProvincial(value,2)}>
-                  {this.renderSelectOption(provincial[getFieldValue('location')[1]] || [])}
+                  {this.renderSelectOption(provincial[getFieldValue('location')[1]] || {})}
                 </Select>
               </div>
             )}
@@ -588,7 +614,27 @@ export default class RoleEdit extends Component {
               </Select>
             )}
           </Form.Item>
-
+          <Form.Item label="所属机构" hasFeedback>
+            {getFieldDecorator('organization', {
+              initialValue:formData.organization,
+              rules: [{ required: true, message: '请选择所属机构!' }],
+            })(
+              <Select 
+                placeholder="请选择所属机构"
+                showSearch
+                notFoundContent={null}
+                filterOption={false}
+                onSearch={this.handleSearchOrganization}
+              > 
+                {
+                  organizationFilter && organizationFilter.map(item=>{
+                    return <Select.Option key={item.id}>{item.name}</Select.Option>
+                  })
+                }
+              </Select>
+            )}
+          </Form.Item>
+            
           {this.renderDeficitFileds()}
 
           <div className={styles["title"]}>其他信息</div>
@@ -608,7 +654,7 @@ export default class RoleEdit extends Component {
                 { required: true, message: '请选择角色配置!' },
               ],
             })(
-              <Select placeholder="请选择角色配置"> 
+              <Select placeholder="请选择角色配置" mode="multiple"> 
                 {this.renderSelectOption(options.role)}
               </Select>
             )}

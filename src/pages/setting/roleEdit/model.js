@@ -3,6 +3,8 @@ import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
 import {Modal} from 'antd'
 import { getUserRoleOptions,getProvincialOptions,getFormAdd,getOrganization ,getFormData} from './service';
+import { getUrlParams } from '../../../utils/url';
+const query = getUrlParams()
 
 const Model = {
   namespace: 'roleEdit',
@@ -10,19 +12,42 @@ const Model = {
   state: {
     options: {},
     provincial:{},
-    formData:{}
+    formData:{},
+    organization:[]
   },
 
   effects: {
     *getOptions({ payload }, { call, put }) {
+      const { account } = query
       const response = yield call(getUserRoleOptions, payload)
       const provincialResponse = yield call(getProvincialOptions,payload)
-      // const organization = yield call(getOrganization)
+      if(account){
+        const formData = yield call(getFormData, {account:account})
+        yield put({
+          type: 'setState',
+          payload: {
+            formData:formData.data || {},
+            options:response.data || {},
+            provincial:provincialResponse.data || {}
+          },
+        });
+      } else {
+        yield put({
+          type: 'setState',
+          payload: {
+            options:response.data || {},
+            provincial:provincialResponse.data || {}
+          },
+        });
+      }
+
+    },
+    *getOrganization({ payload }, { call, put }){
+      const organization = yield call(getOrganization,payload)
       yield put({
         type: 'setState',
         payload: {
-          options:response.data || {},
-          provincial:provincialResponse.data || {}
+          organization:organization.data && organization.data.list || []
         },
       });
     },
