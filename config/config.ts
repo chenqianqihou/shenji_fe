@@ -251,11 +251,7 @@ export default {
   chainWebpack: webpackPlugin,
   proxy: {
     '/api/': {
-<<<<<<< HEAD
-      target: 'http://39.106.225.194:8090/',
-=======
       target: 'http://39.106.225.194:8080/',
->>>>>>> zhaoyi_dev
       changeOrigin: true,
       pathRewrite: { '^/server': '' },
     },
