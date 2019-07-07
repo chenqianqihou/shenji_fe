@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message } from 'antd';
+import router from 'umi/router';
 import { getOrgUsers, getOrgList, resetPwd, deleteUsers, queryUser } from '../../services/setting';
 
 const { TreeNode } = Tree;
@@ -115,11 +116,13 @@ export default class RoleSetting extends Component {
   }
 
   handleItemDetail = e => {
-    console.log(e);
+    const { pid } = e;
+    router.push(`/setting/roleShow?account=${pid}`);
   }
 
   handleItemUpdate= e => {
-    console.log(e);
+    const { pid } = e;
+    router.push(`/setting/roleEdit?account=${pid}`);
   }
 
   // 批量删除
@@ -136,9 +139,12 @@ export default class RoleSetting extends Component {
     });
   }
 
+  handleAdd = () => {
+    router.push('/setting/roleEdit');
+  }
+
   queryUsers = () => {
     const { searchInputValue } = this.state;
-    console.log(searchInputValue);
     if (searchInputValue) {
       queryUser({
         organization: 1,
