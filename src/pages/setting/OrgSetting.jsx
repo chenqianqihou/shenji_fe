@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider } from 'antd';
-import { userSelect } from '../../services/setting';
+import { } from '../../services/setting';
 
 const { TreeNode } = Tree;
 const { Content, Sider } = Layout;
@@ -176,37 +176,7 @@ export default class OrgSetting extends Component {
     return (
       <div>
         <PageHeaderWrapper />
-        <Content style={{ margin: '20px 0', background: '#FFF', padding: '20px' }}>
-        <Row>
-          <Col span={4}>
-            <Sider style={{ background: '#fff', borderRight: '1px solid #CCC' }}>
-              {tree}
-            </Sider>
-          </Col>
-          <Col span={18}>
-            <Row style={{ display: 'flex', alignItems: 'center' }}>
-              <Col span={2}>查询条件：</Col>
-              <Col span={6} style={{ marginRight: '20px' }}><Input placeholder="请输入姓名/人员ID"></Input></Col>
-              <Col span={2}><Button type="primary">查询</Button></Col>
-              <Col span={2}><Button >重置</Button></Col>
-            </Row>
-            <Row style={{ marginTop: '20px' }}>
-              <Col span={3}><Button type="primary"><Icon type="plus" />新增人员</Button></Col>
-              <Col span={3}><Button type="primary">批量删除</Button></Col>
-              <Col span={3}><Button type="primary">导入人员</Button></Col>
-              <Col span={3}><Button ><Icon type="arrow-down" />下载模板</Button></Col>
-            </Row>
-          </Col>
-          <Col span={18} style={{ marginTop: '20px' }}>
-            <Table
-              columns={columns}
-              rowSelection={rowSelection}
-              dataSource={data}
-            >
-            </Table>
-          </Col>
-        </Row>
-        </Content>
+
       </div>
     );
   }

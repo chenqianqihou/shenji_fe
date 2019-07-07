@@ -1,171 +1,185 @@
-// 机构配置
+// 角色配置
 
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider } from 'antd';
-import { userSelect } from '../../services/setting';
+import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message } from 'antd';
+import { getOrgUsers, getOrgList, resetPwd, deleteUsers, queryUser } from '../../services/setting';
 
 const { TreeNode } = Tree;
 const { Content, Sider } = Layout;
+const treeMapType = {
+  1: '中介机构',
+  2: '审计机关',
+  3: '内审机构',
+};
 // eslint-disable-next-line react/prefer-stateless-function
 export default class RoleSetting extends Component {
   // eslint-disable-next-line no-useless-constructor
   constructor(props) {
     super(props);
+    this.state = {
+      orgListTree: [],
+      tableData: [],
+      selectedItems: [],
+      selectedOrgId: -1,
+      searchInputValue: '',
+    };
   }
 
   componentDidMount() {
-    // userSelect().then(res => {
-    //   console.log(res);
-    // });
+    getOrgList().then(res => {
+      if (res.error.returnCode === 0) {
+        this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
+      }
+    });
   }
 
+  // 树的最外层 三个类型
+  formatOrgListTreeOuter = list =>
+  <Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onTreeNodeSelect}>
+    {list.map(v => <TreeNode title={treeMapType[v.type]} key={v.type} type="parent">
+      {
+        // eslint-disable-next-line max-len
+        Array.isArray(v.list) ? v.list.map(value => this.geneChildTreeNode(value)) : this.geneParentTreeNode(v.list)})
+    </TreeNode>)}
+  </Tree>
+
+  // 构造树的父亲节点
+  geneParentTreeNode = data => {
+    const keys = Object.keys(data);
+    return keys.map(v =>
+      <TreeNode title={data[v].distinct.name} key={v} type="parent">
+        {data[v].list.map(value => this.geneChildTreeNode(value))}
+      </TreeNode>,
+    );
+  }
+
+  // 构造树的子节点
+  geneChildTreeNode = node => <TreeNode title={node.name} key={node.id} type="child" />;
+
+  getUserListByOrg = orgId => {
+    getOrgUsers({ organid: orgId, start: 0, length: 1000 }).then(res => {
+      if (res.error.returnCode === 0) {
+        this.setState({ tableData: res.data.list });
+      }
+    });
+  }
+
+  onTreeNodeSelect = key => {
+    this.setState({ selectedOrgId: key });
+    this.getUserListByOrg(key);
+  }
+
+
   handleItemDel = e => {
+    Modal.confirm({
+      title: '确定要删除该人员信息？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        this.deleteOrgUsers([e.pid]);
+      },
+    });
+  }
+
+  deleteOrgUsers = list => {
+    deleteUsers({ pid: list }).then(res => {
+        if (res.error.returnCode === 0) {
+          message.success(res.error.returnUserMessage || '操作成功');
+          this.getUserListByOrg(this.state.selectedOrgId);
+        } else {
+          message.error(res.error.returnUserMessage || '操作失败');
+        }
+    });
+  }
+
+  handleItemAssign = e => {
     console.log(e);
   }
 
-  render() {
-    const tree = <Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onSelect}>
-      <TreeNode title="parent 1" key="0-0">
-        <TreeNode title="parent 1-0" key="0-0-0">
-          <TreeNode title="leaf" key="0-0-0-0" />
-          <TreeNode title="leaf" key="0-0-0-1" />
-          <TreeNode title="leaf" key="0-0-0-2" />
-        </TreeNode>
-        <TreeNode title="parent 1-1" key="0-0-1">
-          <TreeNode title="leaf" key="0-0-1-0" />
-        </TreeNode>
-        <TreeNode title="parent 1-2" key="0-0-2">
-          <TreeNode title="leaf" key="0-0-2-0" />
-          <TreeNode title="leaf" key="0-0-2-1" />
-        </TreeNode>
-      </TreeNode>
-    </Tree>;
+  handleItemResetPwd = e => {
+    Modal.confirm({
+      title: '确定要重置该人员密码？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        resetPwd({ pid: e.pid }).then(res => {
+          if (res.error.returnCode === 0) {
+            message.success(res.error.returnUserMessage || '操作成功');
+          } else {
+            message.error(res.error.returnUserMessage || '操作失败');
+          }
+        });
+      },
+    });
+  }
 
+  handleItemDetail = e => {
+    console.log(e);
+  }
+
+  handleItemUpdate= e => {
+    console.log(e);
+  }
+
+  // 批量删除
+  handleDel = () => {
+    Modal.confirm({
+      title: '确定要删除这些人员信息？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        const { selectedItems } = this.state;
+        const removeList = selectedItems.map(v => v.pid);
+        this.deleteOrgUsers(removeList);
+      },
+    });
+  }
+
+  queryUsers = () => {
+    const { searchInputValue } = this.state;
+    console.log(searchInputValue);
+    if (searchInputValue) {
+      queryUser({
+        organization: 1,
+        query: searchInputValue,
+        length: 1000,
+        page: 1,
+      }).then(res => {
+        if (res.error.returnCode === 0) {
+          this.setState({ tableData: res.data.list });
+        }
+      });
+    }
+  }
+
+  render() {
     const columns = [
       { title: '姓名', dataIndex: 'name' },
-      { title: '人员ID', dataIndex: 'id' },
-      { title: '性别', dataIndex: 'sex' },
+      { title: '人员ID', dataIndex: 'pid' },
+      { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
       { title: '人员类型', dataIndex: 'type' },
       { title: '能力等级', dataIndex: 'level' },
-      { title: '所属省市区', dataIndex: 'belong' },
+      { title: '所属省市区', dataIndex: 'location' },
       { title: '操作',
         dataIndex: 'manage',
-        render: () => <span>
-          <a onClick={this.handleItemDel}>删除</a>
+        render: (text, record, index) => <span>
+          <a onClick={() => this.handleItemDel(record)}>删除</a>
           <Divider type="vertical" />
-          <a>编辑</a>
+          <a onClick={() => this.handleItemUpdate(record)}>编辑</a>
           <Divider type="vertical" />
-          <a>详情</a>
+          <a onClick={() => this.handleItemDetail(record)}>详情</a>
           <Divider type="vertical" />
-          <a>重置密码</a>
+          <a onClick={() => this.handleItemResetPwd(record)}>重置密码</a>
           <Divider type="vertical" />
-          <a>分配角色</a>
+          <a onClick={() => this.handleItemAssign(record)}>分配角色</a>
         </span> },
     ];
-
-    const data = [
-      {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      },
-      {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      },
-      {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      },
-      {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      },
-      {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      },
-      {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      }, {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      },
-      {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      }, {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      }, {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      }, {
-        name: '111',
-        id: '111',
-        sex: '111',
-        type: 'type',
-        level: '1',
-        belong: 'aaa',
-        manage: '1',
-      },
-    ];
-
+    const { tableData, orgListTree } = this.state;
 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        this.setState({ selectedItems: selectedRows });
       },
       getCheckboxProps: record => ({
         disabled: record.name === 'Disabled User', // Column configuration not to be checked
@@ -180,30 +194,38 @@ export default class RoleSetting extends Component {
         <Row>
           <Col span={4}>
             <Sider style={{ background: '#fff', borderRight: '1px solid #CCC' }}>
-              {tree}
+              {orgListTree}
             </Sider>
           </Col>
-          <Col span={18}>
+          <Col span={16} style={{ marginLeft: '100px' }}>
             <Row style={{ display: 'flex', alignItems: 'center' }}>
-              <Col span={2}>查询条件：</Col>
-              <Col span={6} style={{ marginRight: '20px' }}><Input placeholder="请输入姓名/人员ID"></Input></Col>
-              <Col span={2}><Button type="primary">查询</Button></Col>
-              <Col span={2}><Button >重置</Button></Col>
+              查询条件：
+              <Col span={6} style={{ marginRight: '20px' }}>
+                <Input
+                  placeholder="请输入姓名/人员ID"
+                  value={this.state.searchInputValue}
+                  onChange={e => { this.setState({ searchInputValue: e.target.value }); }}
+                  ></Input>
+                </Col>
+              <Col span={6}>
+                <Button type="primary" onClick={this.queryUsers}>查询</Button>
+                <Button style={{ marginLeft: '20px' }} onClick={() => this.setState({ searchInputValue: '' })}>重置</Button>
+              </Col>
             </Row>
-            <Row style={{ marginTop: '20px' }}>
-              <Col span={3}><Button type="primary"><Icon type="plus" />新增人员</Button></Col>
-              <Col span={3}><Button type="primary"><Icon type="delete" />批量删除</Button></Col>
-              <Col span={3}><Button type="primary"><Icon type="upload" />导入人员</Button></Col>
-              <Col span={3}><Button ><Icon type="arrow-down" />下载模板</Button></Col>
+            <Row style={{ margin: '20px 0' }}>
+              <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleAdd}><Icon type="plus" />新增人员</Button>
+              <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleDel}><Icon type="delete" />批量删除</Button>
+              <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleUpload}><Icon type="upload" />导入人员</Button>
+              <Button onClick={this.handleDownload} ><Icon type="arrow-down" />下载模板</Button>
             </Row>
-          </Col>
-          <Col span={18} style={{ marginTop: '20px' }}>
-            <Table
-              columns={columns}
-              rowSelection={rowSelection}
-              dataSource={data}
-            >
-            </Table>
+            <Row>
+              <Table
+                columns={columns}
+                rowSelection={rowSelection}
+                dataSource={tableData}
+              >
+              </Table>
+            </Row>
           </Col>
         </Row>
         </Content>
