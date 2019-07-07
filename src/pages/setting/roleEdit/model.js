@@ -19,16 +19,20 @@ const Model = {
   effects: {
     *getOptions({ payload }, { call, put }) {
       const { account } = query
+      console.log('getOptions',account)
       const response = yield call(getUserRoleOptions, payload)
       const provincialResponse = yield call(getProvincialOptions,payload)
+      console.log('getOptions',account)
       if(account){
         const formData = yield call(getFormData, {account:account})
+        const organization = yield call(getOrganization,{type:formData.data.type})
         yield put({
           type: 'setState',
           payload: {
             formData:formData.data || {},
             options:response.data || {},
-            provincial:provincialResponse.data || {}
+            provincial:provincialResponse.data || {},
+            organization:organization.data && organization.data.list || []
           },
         });
       } else {

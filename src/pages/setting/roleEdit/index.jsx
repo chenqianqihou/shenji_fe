@@ -26,15 +26,17 @@ export default class RoleEdit extends Component {
   
   componentDidMount(){
     const { dispatch } = this.props;
-
+    console.log('componentDidMount')
     dispatch({
       type: 'roleEdit/getOptions',
     });
   }
 
   componentWillReceiveProps(nextProps){
+    console.log('componentWillReceiveProps')
     this.setState({
-      organizationFilter:nextProps.roleEdit.organization
+      organizationFilter:nextProps.roleEdit.organization,
+      roleType:nextProps.roleEdit.formData.type || '',
     })
   }
 
@@ -401,7 +403,6 @@ export default class RoleEdit extends Component {
     const { form:{getFieldDecorator,getFieldValue},roleEdit:{options,provincial,formData} } = this.props;
     const provincialOption = provincial['100000'] || {}
 
-    console.log('aaaa',organizationFilter)
     return (
       <div className={styles["role_manager_edit"]}>
         <PageHeaderWrapper />
