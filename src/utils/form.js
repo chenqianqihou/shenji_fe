@@ -45,8 +45,8 @@ export const UserId2Age = (UUserCard)=>{
 export const UserId2Sex = (UUserCard)=>{
 //获取性别 
   if (parseInt(UUserCard.substr(16, 1)) % 2 == 1) { 
-    return 'man'
+    return 1
   } else { 
-    return 'woman'
+    return 2
   } 
 }

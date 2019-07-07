@@ -251,7 +251,7 @@ export default {
   chainWebpack: webpackPlugin,
   proxy: {
     '/api/': {
-      target: 'http://39.106.225.194:8080/',
+      target: 'http://39.106.225.194:8090/',
       changeOrigin: true,
       pathRewrite: { '^/server': '' },
     },

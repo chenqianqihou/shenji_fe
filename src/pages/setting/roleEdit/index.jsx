@@ -4,9 +4,11 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Input, Form, Select,DatePicker ,InputNumber,Button} from 'antd';
 import moment from 'moment'
 import { cardValid, UserId2Birthday,UserId2Age,UserId2Sex } from '../../../utils/form';
+import { getUrlParams } from '../../../utils/url';
 import styles from './index.less';
 
 const TextArea = Input.TextArea
+const query = getUrlParams()
 // eslint-disable-next-line react/prefer-stateless-function
 @Form.create()
 @connect(({roleEdit}) => ({
@@ -17,14 +19,25 @@ export default class RoleEdit extends Component {
     disabled:false,
     roleType:'',
     professionTechnicalNum:1,
-    trainingContentNum:1
+    trainingContentNum:1,
+    qualificationState:[],
+    trainState:[]
   }
   
   componentDidMount(){
+    const { account } = query
     const { dispatch } = this.props;
     dispatch({
       type: 'roleEdit/getOptions',
     });
+    if(account){
+      dispatch({
+        type: 'roleEdit/getFormData',
+        payload:{
+          account:account
+        }
+      });
+    }
   }
 
   inputUserIDNum = (e)=>{
@@ -45,14 +58,14 @@ export default class RoleEdit extends Component {
 
   handleChangeProvincial = (value,index)=>{
     const { form:{getFieldValue,setFieldsValue} } = this.props;
-    const newProvincial = [].concat(getFieldValue('provincial_city'))
+    const newProvincial = [].concat(getFieldValue('location'))
     newProvincial[index] = value
 
     for(let i = index+1;i<3;i++){
       newProvincial[i] = ''
     }
     setFieldsValue({
-      provincial_city: newProvincial,
+      location: newProvincial,
     })
   }
 
@@ -77,10 +90,28 @@ export default class RoleEdit extends Component {
   
 
   handleSubmit = e => {
+    const {dispatch} = this.props
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
+      const {trainState,qualificationState} = this.state
+      
       if (!err) {
-        console.log('Received values of form: ', values);
+        const sendValues = Object.assign({},values)
+        if(values.auditbegin) sendValues.auditbegin = values.auditbegin.unix()
+        if(values.birthday) sendValues.birthday = values.birthday.unix()
+        if(values.location) sendValues.location = values.location.join(',')
+        if(values.workbegin) sendValues.workbegin = values.workbegin.unix()
+        if(trainState.length) sendValues.train = trainState
+        if(qualificationState.length) sendValues.qualification = qualificationState
+
+
+        console.log('sendValues',sendValues)
+        dispatch({
+          type: 'roleEdit/submitForm',
+          payload:{
+            ...sendValues
+          }
+        });
       }
     });
   };
@@ -88,40 +119,68 @@ export default class RoleEdit extends Component {
   renderSelectOption(options={}){
     let dom = []
     Object.keys(options).forEach(key=>{
-      dom.push(<Select.Option value={key}>{options[key]}</Select.Option>)
+      dom.push(<Select.Option value={parseInt(key)}>{options[key]}</Select.Option>)
     })
     return dom
   }
 
-  /* 专业技术资质（选填）：手动填写，可添加多个 获取专业技术资质日期（选填）：日历选择
-【专业技术资质】与【获取专业技术资质日期】属联动关系、添加一个“专业技术资质”便同步增加“获取专业技术资质日期”选框*/
   renderProfessionTechnical(){
-    const {professionTechnicalNum} = this.state
-    const { form:{getFieldDecorator,getFieldValue},roleEdit:{options} } = this.props;
-
+    const {professionTechnicalNum,qualificationState} = this.state
+    const { form:{getFieldDecorator},roleEdit:{options,formData} } = this.props;
+    const {qualification=[]} = formData
     const dom = []
+
+    const handleChangeInput = (e,index)=>{
+      const newQualification = [].concat(qualificationState)
+      if(newQualification[index]){
+        newQualification[index].info = e.target.value
+      } else {
+        newQualification[index] = {
+          info:e.target.value
+        }
+      }
+      this.setState({
+        qualificationState:newQualification
+      })
+    }
+
+    const handleChangeTime = (moment,index)=>{
+      const newQualification = [].concat(qualificationState)
+      if(newQualification[index]){
+        newQualification[index].time = moment.unix()
+      } else {
+        newQualification[index] = {
+          time:moment.unix()
+        }
+      }
+      this.setState({
+        qualificationState:newQualification
+      })
+    }
+
     for(let i = 0;i<professionTechnicalNum;i++){
       dom.push(
         <div className={styles["add_fields"]}>
           <Form.Item label={`专业技术资质${i+1}`}>
-            {getFieldDecorator(`abcde_${i}`, {
-            })( <Input placeholder="请输入专业技术资质" />)}
+            {getFieldDecorator(`qualification_${i}`, {
+              initialValue:qualification[i]?qualification[i].info : null
+            })( <Input placeholder="请输入专业技术资质" onChange={(e)=>handleChangeInput(e,i)}/>)}
           </Form.Item>
 
           <Form.Item label="获取专业技术资质日期" required>
-            {getFieldDecorator(`abcdefg_${i}`, {
+            {getFieldDecorator(`qualification_time_${i}`, {
+              initialValue:qualification[i] && qualification[i].time ? moment(qualification[i].time): null,
               rules:[
                 {
                   validator: (rule, value, callback) => {
-                    console.log('aaaaa',getFieldValue(`abcde_${i}`),value && getFieldValue(`beginJobTime_${i}`))
-                    if (!value && getFieldValue(`abcde_${i}`)) {
+                    if (!value && getFieldValue(`qualification_${i}`)) {
                       callback('请选择获取专业技术资质日期!');
                     }
                     callback();
                   },
                 }
               ]
-            })( <DatePicker />)}
+            })( <DatePicker onChange={(moment)=>handleChangeTime(moment,i)}/>)}
           </Form.Item>
           {
             i === professionTechnicalNum-1
@@ -137,16 +196,26 @@ export default class RoleEdit extends Component {
   }
 
   renderTrainingContent(){
-    const {trainingContentNum} = this.state
-    const { form:{getFieldDecorator},roleEdit:{options} } = this.props;
-
+    const {trainingContentNum,trainState} = this.state
+    const { form:{getFieldDecorator,getFieldValue},roleEdit:{options,formData} } = this.props;
+    const { train=[] } = formData
     const dom = []
+    const handleChange = (e,index)=>{
+      
+      const newTrain = [].concat(trainState)
+      newTrain[index] = e.target.value
+      console.log('index',index,newTrain,newTrain[index])
+      this.setState({
+        trainState:newTrain
+      })
+    }
     for(let i = 0;i<trainingContentNum;i++){
       dom.push(
         <div className={styles["add_fields"]}>
           <Form.Item label={i === 0?`业务培训情况`:' '}>
-            {getFieldDecorator(`beginJobTime_${i}`, {
-            })( <Input placeholder="请输入业务培训情况" />)}
+            {getFieldDecorator(`train_${i}`, {
+              initialValue:train[i] || ''
+            })( <Input placeholder="请输入业务培训情况" onChange={(e)=>handleChange(e,i)}/>)}
           </Form.Item>
 
           {
@@ -162,7 +231,7 @@ export default class RoleEdit extends Component {
 
   renderDeficitFileds(){
     const { roleType } = this.state
-    const { form:{getFieldDecorator},roleEdit:{options} } = this.props;
+    const { form:{getFieldDecorator},roleEdit:{options,formData} } = this.props;
     switch(parseInt(roleType)){
       //审计机关
       case 1:
@@ -170,12 +239,14 @@ export default class RoleEdit extends Component {
           <div>
             <Form.Item label="所属部门" hasFeedback>
               {getFieldDecorator('department', {
+                initialValue:formData.department,
                 rules: [{ required: true, message: '请输入所属部门!' }],
-              })(<Input placeholder="请输入所属部门" />)}
+              })(<Input placeholder="请输入所属部门"/>)}
             </Form.Item>
 
             <Form.Item label="现任职务" hasFeedback>
               {getFieldDecorator('position', {
+                initialValue:formData.position,
                 rules: [
                   { required: true, message: '请选择现任职务!' },
                 ],
@@ -188,6 +259,7 @@ export default class RoleEdit extends Component {
 
             <Form.Item label="岗位性质" hasFeedback>
               {getFieldDecorator('nature', {
+                initialValue:formData.nature,
                 rules: [
                   { required: true, message: '请选择岗位性质!' },
                 ],
@@ -200,6 +272,7 @@ export default class RoleEdit extends Component {
 
             <Form.Item label="专业技术职称" hasFeedback>
               {getFieldDecorator('techtitle', {
+                initialValue:formData.techtitle,
               })(
                 <Select placeholder="请选择专业技术职称" mode="multiple"> 
                   {this.renderSelectOption(options.techtitle)}
@@ -209,6 +282,7 @@ export default class RoleEdit extends Component {
 
             <Form.Item label="审计特长" hasFeedback>
               {getFieldDecorator('expertise', {
+                initialValue:formData.expertise,
               })(
                 <Select placeholder="请选择审计特长" mode="multiple"> 
                   {this.renderSelectOption(options.expertise)}
@@ -219,12 +293,14 @@ export default class RoleEdit extends Component {
             {this.renderTrainingContent()}
 
             <Form.Item label="参加工作年月" hasFeedback>
-              {getFieldDecorator('jobTime', {
+              {getFieldDecorator('workbegin', {
+                initialValue:formData.workbegin?moment(formData.workbegin):null
               })( <DatePicker />)}
             </Form.Item>
 
             <Form.Item label="参加审计年月" hasFeedback>
-              {getFieldDecorator('auditTime', {
+              {getFieldDecorator('auditbegin', {
+                initialValue:formData.auditbegin?moment(formData.auditbegin):null
               })( <DatePicker />)}
             </Form.Item>
             
@@ -238,14 +314,16 @@ export default class RoleEdit extends Component {
         return(
           <div>
             <Form.Item label="现任职务" hasFeedback>
-              {getFieldDecorator('positiontext', {
+              {getFieldDecorator('position', {
+                initialValue:formData.position
               })(
                 <Input placeholder="请输入现任职务" />
               )}
             </Form.Item>
 
             <Form.Item label="开始从业日期" hasFeedback>
-              {getFieldDecorator('beginJobTime', {
+              {getFieldDecorator('workbegin', {
+                initialValue:formData.workbegin?moment(formData.workbegin):null,
                 rules:[
                   { type: 'object',required: true, message: '请选择开始从业日期!' },
                 ]
@@ -253,9 +331,10 @@ export default class RoleEdit extends Component {
             </Form.Item>
 
             <Form.Item label="专业特长" hasFeedback>
-              {getFieldDecorator('positiontext', {
+              {getFieldDecorator('specialties', {
+                initialValue:formData.specialties,
                 rules:[
-                  { type: 'object',required: true, message: '请选择开始从业日期!' },
+                  { required: true, message: '请输入专业特长!' },
                 ]
               })(
                 <Input placeholder="请输入专业特长" />
@@ -265,7 +344,8 @@ export default class RoleEdit extends Component {
             {this.renderProfessionTechnical()}
 
             <Form.Item label="近三年主要业绩" hasFeedback>
-              {getFieldDecorator('beginJobTime', {
+              {getFieldDecorator('achievements', {
+                initialValue:formData.achievements,
                 rules: [
                   {
                     validator: (rule, value, callback) => {
@@ -291,10 +371,9 @@ export default class RoleEdit extends Component {
       wrapperCol: { span: 14 },
     }
     const {disabled} = this.state
-    const { form:{getFieldDecorator,getFieldValue},roleEdit:{options,provincial} } = this.props;
+    const { form:{getFieldDecorator,getFieldValue},roleEdit:{options,provincial,formData} } = this.props;
     const provincialOption = provincial['100000'] || {}
 
-    console.log('options',options,provincial)
     return (
       <div className={styles["role_manager_edit"]}>
         <PageHeaderWrapper />
@@ -302,12 +381,14 @@ export default class RoleEdit extends Component {
           <div className={styles["title"]}>基础信息</div>
           <Form.Item label="姓名" hasFeedback>
             {getFieldDecorator('name', {
+              initialValue:formData.name,
               rules: [{ required: true, message: '请输入姓名!' }],
             })(<Input placeholder="请输入姓名" />)}
           </Form.Item>
 
           <Form.Item label="身份证号" hasFeedback>
-            {getFieldDecorator('userIDNum', {
+            {getFieldDecorator('cardid', {
+              initialValue:formData.cardid,
               rules: [
                 { required: true, message: '请输入身份证号!' },
                 {
@@ -324,19 +405,21 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="性别" hasFeedback>
             {getFieldDecorator('sex', {
+              initialValue:formData.sex,
               rules: [
                 { required: true, message: '请选择性别!' },
               ],
             })(
               <Select placeholder="请选择性别" disabled={disabled}>
-                <Select.Option value="man">男</Select.Option>
-                <Select.Option value="woman">女</Select.Option>
+                <Select.Option value={1}>男</Select.Option>
+                <Select.Option value={2}>女</Select.Option>
               </Select>
             )}
           </Form.Item>
 
           <Form.Item label="出生年月" hasFeedback>
             {getFieldDecorator('birthday', {
+              initialValue:formData.birthday?moment(formData.birthday):null,
               rules: [
                 { type: 'object',required: true, message: '请选择出生年月!' },
               ],
@@ -347,6 +430,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="年龄" hasFeedback>
             {getFieldDecorator('age', {
+              initialValue:formData.age,
               rules: [{ required: true, message: '请输入年龄!' }],
             })(
               <Input placeholder="请输入年龄" disabled={disabled}/>
@@ -355,6 +439,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="手机号" hasFeedback>
             {getFieldDecorator('phone', {
+              initialValue:formData.phone,
               rules: [
                 { required: true, message: '请输入手机号!' },
                 {
@@ -372,6 +457,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="邮箱" hasFeedback>
             {getFieldDecorator('email', {
+              initialValue:formData.email,
               rules: [
                 { required: true, message: '请输入邮箱!' },
                 {
@@ -384,6 +470,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="联系地址" hasFeedback>
             {getFieldDecorator('address', {
+              initialValue:formData.address,
               rules: [{ required: true, message: '请输入联系地址!' }],
             })(<Input placeholder="请输入联系地址" />)}
           </Form.Item>
@@ -392,6 +479,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="学历" hasFeedback>
             {getFieldDecorator('education', {
+              initialValue:formData.education,
               rules: [
                 { required: true, message: '请选择学历!' },
               ],
@@ -403,7 +491,8 @@ export default class RoleEdit extends Component {
           </Form.Item>
 
           <Form.Item label="毕业学校" hasFeedback>
-            {getFieldDecorator('graduation', {
+            {getFieldDecorator('school', {
+              initialValue:formData.school,
               rules: [
                 { required: true, message: '请输入毕业学校!' },
               ],
@@ -414,6 +503,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="所学专业" hasFeedback>
             {getFieldDecorator('major', {
+              initialValue:formData.major,
               rules: [
                 { required: true, message: '请输入所学专业!' },
               ],
@@ -424,6 +514,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="政治面貌" hasFeedback>
             {getFieldDecorator('political', {
+              initialValue:formData.political,
               rules: [
                 { required: true, message: '请选择政治面貌!' },
               ],
@@ -437,8 +528,8 @@ export default class RoleEdit extends Component {
           <div className={styles["title"]}>职能信息</div>
           
           <Form.Item label="所属省市区" required>
-            {getFieldDecorator('provincial_city', {
-              initialValue:['','',''],
+            {getFieldDecorator('location', {
+              initialValue:formData.location?formData.location.split(',') : ['','',''],
               rules: [
                 {
                   validator: (rule, value, callback) => {
@@ -455,16 +546,16 @@ export default class RoleEdit extends Component {
               ],
             })(
               <div>
-                <Select placeholder="请选择" value={getFieldValue('provincial_city')[0]} onChange={(value)=>this.handleChangeProvincial(value,0)}>
+                <Select placeholder="请选择" value={getFieldValue('location')[0]} onChange={(value)=>this.handleChangeProvincial(value,0)}>
                   {this.renderSelectOption(provincialOption)}
                 </Select>
 
-                <Select placeholder="请选择" value={getFieldValue('provincial_city')[1]} onChange={(value)=>this.handleChangeProvincial(value,1)}>
-                  {this.renderSelectOption(provincial[getFieldValue('provincial_city')[0]] || [])}
+                <Select placeholder="请选择" value={getFieldValue('location')[1]} onChange={(value)=>this.handleChangeProvincial(value,1)}>
+                  {this.renderSelectOption(provincial[getFieldValue('location')[0]] || [])}
                 </Select>
 
-                <Select placeholder="请选择" value={getFieldValue('provincial_city')[2]} onChange={(value)=>this.handleChangeProvincial(value,2)}>
-                  {this.renderSelectOption(provincial[getFieldValue('provincial_city')[1]] || [])}
+                <Select placeholder="请选择" value={getFieldValue('location')[2]} onChange={(value)=>this.handleChangeProvincial(value,2)}>
+                  {this.renderSelectOption(provincial[getFieldValue('location')[1]] || [])}
                 </Select>
               </div>
             )}
@@ -472,6 +563,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="能力等级" hasFeedback>
             {getFieldDecorator('level', {
+              initialValue:formData.level,
             })(
               <Select placeholder="请选择能力等级">
                 {this.renderSelectOption(options.level)}
@@ -480,13 +572,18 @@ export default class RoleEdit extends Component {
           </Form.Item>
 
           <Form.Item label="人员类型" hasFeedback>
-            {getFieldDecorator('roleType', {
+            {getFieldDecorator('type', {
+              initialValue:formData.type,
               rules: [
                 { required: true, message: '请选择人员类型!' },
               ],
             })(
               <Select placeholder="请选择人员类型" onChange={this.handleChangeRoleType}> 
-                {this.renderSelectOption(options.level)}
+                {this.renderSelectOption({
+                  1:'审计机关',
+                  2: '内审机构',
+                  3:'中介机构'
+                })}
               </Select>
             )}
           </Form.Item>
@@ -496,20 +593,22 @@ export default class RoleEdit extends Component {
           <div className={styles["title"]}>其他信息</div>
 
           <Form.Item label="备注" hasFeedback>
-            {getFieldDecorator('aaa', {
+            {getFieldDecorator('comment', {
+              initialValue:formData.comment,
             })(
               <TextArea rows={4} maxlength={200} placeholder="请输入备注,最多200个字"/>
             )}
           </Form.Item>
 
           <Form.Item label="角色配置" hasFeedback>
-            {getFieldDecorator('bbb', {
+            {getFieldDecorator('role', {
+              initialValue:formData.role,
               rules: [
                 { required: true, message: '请选择角色配置!' },
               ],
             })(
               <Select placeholder="请选择角色配置"> 
-                {this.renderSelectOption(options.level)}
+                {this.renderSelectOption(options.role)}
               </Select>
             )}
           </Form.Item>
