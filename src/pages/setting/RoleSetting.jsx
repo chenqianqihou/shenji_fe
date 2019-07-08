@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message, Select } from 'antd';
 import router from 'umi/router';
-import { getOrgUsers, getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
+import { getProvincialOptions, getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
 
 const { TreeNode } = Tree;
 const { Content, Sider } = Layout;
@@ -14,6 +14,19 @@ const treeMapType = {
   2: '内审机构',
   3: '审计机关',
 };
+const levelMap = {
+  1: 'A',
+  2: 'B',
+  3: 'C',
+  4: 'D',
+};
+const typeMap = {
+  1: '审计机关',
+  2: '内审机构',
+  3: '中介机构',
+};
+let provincial = {};
+
 // eslint-disable-next-line react/prefer-stateless-function
 export default class RoleSetting extends Component {
   // eslint-disable-next-line no-useless-constructor
@@ -39,6 +52,30 @@ export default class RoleSetting extends Component {
       }
     });
     this.queryUsers();
+
+    getProvincialOptions().then(res => {
+      if (res.error.returnCode === 0) {
+        provincial = res.data;
+      }
+    });
+  }
+
+  formateProvincial = code => {
+    const location = code ? code.split(',') : [];
+    let value = '';
+    if (location.length !== 3) {
+      value = code;
+    } else {
+      try {
+        if (location[0]) value += provincial[100000][location[0]] ? `${provincial[100000][location[0]]}，` : '';
+        if (location[1]) value += provincial[location[0]][location[1]] ? `${provincial[location[0]][location[1]]}，` : '';
+        if (location[2]) value += provincial[location[1]][location[2]] ? `${provincial[location[1]][location[2]]}，` : '';
+      } catch {
+        console.log('城市转换错误');
+        value = '城市编码错误';
+      }
+    }
+    return value;
   }
 
   // 树的最外层 三个类型
@@ -69,7 +106,7 @@ export default class RoleSetting extends Component {
   }
 
   onTreeNodeSelect = key => {
-    this.setState({ selectedOrgId: key });
+    this.setState({ selectedOrgId: +key[0] });
     this.getUserListByOrg(key);
   }
 
@@ -197,9 +234,9 @@ export default class RoleSetting extends Component {
       { title: '姓名', dataIndex: 'name' },
       { title: '人员ID', dataIndex: 'pid' },
       { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
-      { title: '人员类型', dataIndex: 'type' },
-      { title: '能力等级', dataIndex: 'level' },
-      { title: '所属省市区', dataIndex: 'location' },
+      { title: '人员类型', dataIndex: 'type', render: text => text && typeMap[text] },
+      { title: '能力等级', dataIndex: 'level', render: text => text && levelMap[text] },
+      { title: '所属省市区', dataIndex: 'location', render: text => text && this.formateProvincial(text) },
       { title: '操作',
         dataIndex: 'manage',
         render: (text, record, index) => <span>
@@ -218,6 +255,7 @@ export default class RoleSetting extends Component {
 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
+        console.log(selectedRowKeys);
         this.setState({ selectedItems: selectedRows });
       },
       getCheckboxProps: record => ({
