@@ -183,12 +183,14 @@ export default {
               path: '/setting/roleEdit',
               name: 'roleEdit',
               component: './setting/roleEdit',
+              hideInMenu:true,
             },
             //人员信息展示
             {
               path: '/setting/roleShow',
               name: 'roleShow',
               component: './setting/roleShow',
+              hideInMenu:true,
             },
           ],
         },
