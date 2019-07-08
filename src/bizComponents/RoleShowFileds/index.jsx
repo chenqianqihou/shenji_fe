@@ -98,9 +98,10 @@ export default class RoleShowFileds extends Component {
               let value = ''
               try{
                 if(location[0]) value += provincial[100000][location[0]] ? provincial[100000][location[0]]+'，' : ''
-              if(location[1]) value += provincial[location[0]][location[1]] ? provincial[location[0]][location[1]]+'，' : ''
-              if(location[2]) value += provincial[location[1]][location[2]] ? provincial[location[1]][location[2]]+'，' : ''
-              }catch(){
+                if(location[1]) value += provincial[location[0]][location[1]] ? provincial[location[0]][location[1]]+'，' : ''
+                if(location[2]) value += provincial[location[1]][location[2]] ? provincial[location[1]][location[2]]+'，' : ''
+              }
+              catch(err){
                 Modal.error({
                   title:'城市编码返回错误'
                 })

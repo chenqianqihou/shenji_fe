@@ -454,7 +454,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="出生年月" hasFeedback>
             {getFieldDecorator('birthday', {
-              initialValue:formData.cardid?moment(UserId2Birthday(formData.cardid * 1000)):null,
+              initialValue:formData.cardid?moment(UserId2Birthday(formData.cardid)):null,
               rules: [
                 { type: 'object',required: true, message: '请选择出生年月!' },
               ],
