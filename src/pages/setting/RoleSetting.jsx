@@ -38,6 +38,7 @@ export default class RoleSetting extends Component {
         this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
       }
     });
+    this.queryUsers();
   }
 
   // 树的最外层 三个类型
@@ -75,7 +76,6 @@ export default class RoleSetting extends Component {
     this.setState({ selectedOrgId: key });
     this.getUserListByOrg(key);
   }
-
 
   handleItemDel = e => {
     Modal.confirm({
@@ -174,7 +174,6 @@ export default class RoleSetting extends Component {
 
   queryUsers = () => {
     const { searchInputValue } = this.state;
-    if (searchInputValue) {
       queryUser({
         organization: 1,
         query: searchInputValue,
@@ -185,7 +184,6 @@ export default class RoleSetting extends Component {
           this.setState({ tableData: res.data.list });
         }
       });
-    }
   }
 
   render() {
