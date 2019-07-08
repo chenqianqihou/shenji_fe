@@ -15,7 +15,7 @@ export async function getFormAdd(params){
   })
 }
 
-export async function getFormUpdate(params){
+export async function getFormUpload(params){
   return request('/api/user/update',{
     method: 'POST',
     data: params
