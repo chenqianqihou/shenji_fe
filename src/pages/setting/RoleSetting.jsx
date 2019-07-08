@@ -65,11 +65,7 @@ export default class RoleSetting extends Component {
   geneChildTreeNode = node => <TreeNode title={node.name} key={node.id} type="child" />;
 
   getUserListByOrg = orgId => {
-    getOrgUsers({ organid: orgId, start: 0, length: 1000 }).then(res => {
-      if (res.error.returnCode === 0) {
-        this.setState({ tableData: res.data.list });
-      }
-    });
+    this.queryUsers();
   }
 
   onTreeNodeSelect = key => {
@@ -173,13 +169,23 @@ export default class RoleSetting extends Component {
   }
 
   queryUsers = () => {
-    const { searchInputValue } = this.state;
-      queryUser({
-        organization: 1,
-        query: searchInputValue,
-        length: 1000,
-        page: 1,
-      }).then(res => {
+    const { searchInputValue, selectedOrgId } = this.state;
+    const params = {
+      query: searchInputValue,
+      length: 1000,
+      page: 1,
+    };
+    if (selectedOrgId < 0) {
+      params.organization = 1;
+    } else if (selectedOrgId < 4 && selectedOrgId >= 0) {
+      params.organization = 2;
+      params.type = selectedOrgId;
+    } else {
+      params.organization = 3;
+      params.organid = selectedOrgId;
+    }
+
+      queryUser(params).then(res => {
         if (res.error.returnCode === 0) {
           this.setState({ tableData: res.data.list });
         }
