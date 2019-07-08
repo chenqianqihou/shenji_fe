@@ -210,11 +210,11 @@ export default class RoleShowFileds extends Component {
           },
           {
             title:'参加工作年月',
-            value:formData.workbegin?moment(formData.workbegin).format('YYYY年MM月DD日'):''
+            value:formData.workbegin?moment(formData.workbegin * 1000).format('YYYY年MM月DD日'):''
           },
           {
             title:'参加审计年月',
-            value:formData.auditbegin?moment(formData.auditbegin).format('YYYY年MM月DD日'):''
+            value:formData.auditbegin?moment(formData.auditbegin * 1000).format('YYYY年MM月DD日'):''
           },
         ]
       //内审机构
@@ -232,7 +232,7 @@ export default class RoleShowFileds extends Component {
           },
           {
             title:'开始从业日期',
-            value:formData.workbegin?moment(formData.workbegin).format('YYYY年MM月DD日'):''
+            value:formData.workbegin?moment(formData.workbegin * 1000).format('YYYY年MM月DD日'):''
           },
           {
             title:'专业特长',
@@ -246,7 +246,7 @@ export default class RoleShowFileds extends Component {
               const qualification = formData.qualification
               let value = ''
               qualification.forEach((item,index)=>{
-                value += index+1+'. '+item.info+'，获取年限：'+moment(item.time).format('YYYY年MM月DD日')+'。' || ''
+                value += index+1+'. '+item.info+'，获取年限：'+moment(item.time * 1000).format('YYYY年MM月DD日')+'。' || ''
               })
               return value
             })()
