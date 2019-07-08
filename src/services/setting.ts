@@ -63,3 +63,7 @@ export async function updateUserRole(params: updateUserRoleParam): Promise<any> 
         data: params
     }) 
 }
+
+export async function getProvincialOptions(){
+    return request('/api/districts/list')
+  }
