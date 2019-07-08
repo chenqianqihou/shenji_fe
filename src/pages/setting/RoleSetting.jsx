@@ -21,9 +21,9 @@ const levelMap = {
   4: 'D',
 };
 const typeMap = {
-  1: '审计机关',
+  1: '中介机构',
   2: '内审机构',
-  3: '中介机构',
+  3: '审计机关',
 };
 let provincial = {};
 
