@@ -117,6 +117,12 @@ export default {
           icon: 'home',
           component: './index/Index',
         },
+        { 
+          path: '/role/center', 
+          name: '个人中心', 
+          component: './center' ,
+          hideInMenu:true,
+        },
         {
           path: '/project',
           name: 'project',
@@ -183,12 +189,14 @@ export default {
               path: '/setting/roleEdit',
               name: 'roleEdit',
               component: './setting/roleEdit',
+              hideInMenu:true,
             },
             //人员信息展示
             {
               path: '/setting/roleShow',
               name: 'roleShow',
               component: './setting/roleShow',
+              hideInMenu:true,
             },
           ],
         },
