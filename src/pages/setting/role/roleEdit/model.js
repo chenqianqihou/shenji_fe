@@ -2,7 +2,8 @@ import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
 import {Modal} from 'antd'
-import { getUserRoleOptions,getProvincialOptions,getFormAdd,getOrganization ,getFormData} from './service';
+import { getUserRoleOptions,getProvincialOptions,getFormAdd,getOrganization ,getFormData
+  ,getFormUpload} from './service';
 import { getUrlParams } from '../../../../utils/url';
 
 const Model = {
@@ -65,7 +66,16 @@ const Model = {
     },
 
     *submitForm({ payload }, { call, put }) {
-      const response = yield call(getFormAdd, payload)
+      let response 
+      const query = getUrlParams()
+      const { account } = query
+      if(account){
+        payload.pid = account
+        response = yield call(getFormUpload, payload)
+      }else{
+        response = yield call(getFormAdd, payload)
+      }
+
       if(response.error.returnCode === 0){
         Modal.success({
           title:'提示',

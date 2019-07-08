@@ -7,7 +7,7 @@ import { cardValid, UserId2Birthday,UserId2Age,UserId2Sex } from '../../../../ut
 import styles from './index.less';
 
 const TextArea = Input.TextArea
-
+let roleTypeFlag = true
 // eslint-disable-next-line react/prefer-stateless-function
 @Form.create()
 @connect(({roleEdit}) => ({
@@ -26,17 +26,24 @@ export default class RoleEdit extends Component {
   
   componentDidMount(){
     const { dispatch } = this.props;
-    console.log('componentDidMount')
     dispatch({
       type: 'roleEdit/getOptions',
     });
   }
 
   componentWillReceiveProps(nextProps){
-    this.setState({
-      organizationFilter:nextProps.roleEdit.organization,
-      roleType:nextProps.roleEdit.formData.type || '',
-    })
+    if(nextProps.roleEdit.formData.type && roleTypeFlag){
+      this.setState({
+        organizationFilter:nextProps.roleEdit.organization,
+        roleType:nextProps.roleEdit.formData.type || '',
+      },()=>{
+        roleTypeFlag = false
+      })
+    } else {
+      this.setState({
+        organizationFilter:nextProps.roleEdit.organization,
+      })
+    }
   }
 
   inputUserIDNum = (e)=>{
@@ -87,7 +94,6 @@ export default class RoleEdit extends Component {
 
   handleChangeRoleType = (value)=>{
     const { dispatch } = this.props
-
     this.setState({
       roleType:value
     })
