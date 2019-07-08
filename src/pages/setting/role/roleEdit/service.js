@@ -15,6 +15,13 @@ export async function getFormAdd(params){
   })
 }
 
+export async function getFormUpdate(params){
+  return request('/api/user/update',{
+    method: 'POST',
+    data: params
+  })
+}
+
 export async function getOrganization(params){
   return request('/api/organization/search?start=0&length=-1&type='+params.type)
 }

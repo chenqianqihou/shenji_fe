@@ -65,7 +65,17 @@ const Model = {
     },
 
     *submitForm({ payload }, { call, put }) {
-      const response = yield call(getFormAdd, payload)
+      const response 
+      const query = getUrlParams()
+      const { account } = query
+
+      if(account){
+        payload.pid = account
+        response = yield call(getFormUpload, payload)
+      }else{
+        response = yield call(getFormAdd, payload)
+      }
+
       if(response.error.returnCode === 0){
         Modal.success({
           title:'提示',
