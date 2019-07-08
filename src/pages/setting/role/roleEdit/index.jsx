@@ -132,6 +132,7 @@ export default class RoleEdit extends Component {
       
       if (!err) {
         const sendValues = Object.assign({},values)
+
         if(values.auditbegin) sendValues.auditbegin = values.auditbegin.unix()
         if(values.birthday) sendValues.birthday = values.birthday.unix()
         if(values.location) sendValues.location = values.location.join(',')
@@ -202,9 +203,9 @@ export default class RoleEdit extends Component {
             })( <Input placeholder="请输入专业技术资质" onChange={(e)=>handleChangeInput(e,i)}/>)}
           </Form.Item>
 
-          <Form.Item label="获取专业技术资质日期" required>
+          <Form.Item label="获取专业技术资质日期">
             {getFieldDecorator(`qualification_time_${i}`, {
-              initialValue:qualification[i] && qualification[i].time ? moment(qualification[i].time): null,
+              initialValue:qualification[i] && qualification[i].time ? moment(qualification[i].time  * 1000): null,
               rules:[
                 {
                   validator: (rule, value, callback) => {
@@ -215,7 +216,7 @@ export default class RoleEdit extends Component {
                   },
                 }
               ]
-            })( <DatePicker onChange={(moment)=>handleChangeTime(moment,i)}/>)}
+            })( <DatePicker allowClear={false} onChange={(moment)=>handleChangeTime(moment,i)}/>)}
           </Form.Item>
           {
             i === professionTechnicalNum-1
@@ -328,14 +329,14 @@ export default class RoleEdit extends Component {
 
             <Form.Item label="参加工作年月" hasFeedback>
               {getFieldDecorator('workbegin', {
-                initialValue:formData.workbegin?moment(formData.workbegin):null
-              })( <DatePicker />)}
+                initialValue:formData.workbegin?moment(formData.workbegin * 1000):null
+              })( <DatePicker allowClear={false}/>)}
             </Form.Item>
 
             <Form.Item label="参加审计年月" hasFeedback>
               {getFieldDecorator('auditbegin', {
-                initialValue:formData.auditbegin?moment(formData.auditbegin):null
-              })( <DatePicker />)}
+                initialValue:formData.auditbegin?moment(formData.auditbegin * 1000):null
+              })( <DatePicker allowClear={false}/>)}
             </Form.Item>
             
             
@@ -357,11 +358,11 @@ export default class RoleEdit extends Component {
 
             <Form.Item label="开始从业日期" hasFeedback>
               {getFieldDecorator('workbegin', {
-                initialValue:formData.workbegin?moment(formData.workbegin):null,
+                initialValue:formData.workbegin?moment(formData.workbegin * 1000):null,
                 rules:[
                   { type: 'object',required: true, message: '请选择开始从业日期!' },
                 ]
-              })( <DatePicker />)}
+              })( <DatePicker allowClear={false}/>)}
             </Form.Item>
 
             <Form.Item label="专业特长" hasFeedback>
@@ -458,7 +459,7 @@ export default class RoleEdit extends Component {
                 { type: 'object',required: true, message: '请选择出生年月!' },
               ],
             })(
-            <DatePicker disabled={disabled}/>
+            <DatePicker disabled={disabled} allowClear={false}/>
             )}
           </Form.Item>
 

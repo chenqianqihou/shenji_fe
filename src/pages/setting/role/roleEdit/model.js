@@ -38,6 +38,7 @@ const Model = {
         yield put({
           type: 'setState',
           payload: {
+            formData:{},
             options:response.data || {},
             provincial:provincialResponse.data || {}
           },

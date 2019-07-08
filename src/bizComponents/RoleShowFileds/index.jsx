@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import {  Row, Col } from 'antd';
+import {  Row, Col, Modal } from 'antd';
 import { cardValid, UserId2Birthday,UserId2Age,UserId2Sex } from '../../utils/form';
 import moment from "moment"
 import styles from './index.less';
@@ -96,9 +96,17 @@ export default class RoleShowFileds extends Component {
             value:(()=>{
               const location = formData.location?formData.location.split(','):[]
               let value = ''
-              if(location[0]) value += provincial[100000][location[0]] ? provincial[100000][location[0]]+'，' : ''
-              if(location[1]) value += provincial[location[0]][location[1]] ? provincial[location[0]][location[1]]+'，' : ''
-              if(location[2]) value += provincial[location[1]][location[2]] ? provincial[location[1]][location[2]]+'，' : ''
+              try{
+                if(location[0]) value += provincial[100000][location[0]] ? provincial[100000][location[0]]+'，' : ''
+                if(location[1]) value += provincial[location[0]][location[1]] ? provincial[location[0]][location[1]]+'，' : ''
+                if(location[2]) value += provincial[location[1]][location[2]] ? provincial[location[1]][location[2]]+'，' : ''
+              }
+              catch(err){
+                Modal.error({
+                  title:'城市编码返回错误'
+                })
+              }
+              
 
               return value
             })()
@@ -210,11 +218,11 @@ export default class RoleShowFileds extends Component {
           },
           {
             title:'参加工作年月',
-            value:formData.workbegin?moment(formData.workbegin).format('YYYY年MM月DD日'):''
+            value:formData.workbegin?moment(formData.workbegin * 1000).format('YYYY年MM月DD日'):''
           },
           {
             title:'参加审计年月',
-            value:formData.auditbegin?moment(formData.auditbegin).format('YYYY年MM月DD日'):''
+            value:formData.auditbegin?moment(formData.auditbegin * 1000).format('YYYY年MM月DD日'):''
           },
         ]
       //内审机构
@@ -232,7 +240,7 @@ export default class RoleShowFileds extends Component {
           },
           {
             title:'开始从业日期',
-            value:formData.workbegin?moment(formData.workbegin).format('YYYY年MM月DD日'):''
+            value:formData.workbegin?moment(formData.workbegin * 1000).format('YYYY年MM月DD日'):''
           },
           {
             title:'专业特长',
@@ -246,7 +254,7 @@ export default class RoleShowFileds extends Component {
               const qualification = formData.qualification
               let value = ''
               qualification.forEach((item,index)=>{
-                value += index+1+'. '+item.info+'，获取年限：'+moment(item.time).format('YYYY年MM月DD日')+'。' || ''
+                value += index+1+'. '+item.info+'，获取年限：'+moment(item.time * 1000).format('YYYY年MM月DD日')+'。' || ''
               })
               return value
             })()
