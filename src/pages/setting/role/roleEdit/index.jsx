@@ -26,17 +26,22 @@ export default class RoleEdit extends Component {
   
   componentDidMount(){
     const { dispatch } = this.props;
-    console.log('componentDidMount')
     dispatch({
       type: 'roleEdit/getOptions',
     });
   }
 
   componentWillReceiveProps(nextProps){
-    this.setState({
-      organizationFilter:nextProps.roleEdit.organization,
-      roleType:nextProps.roleEdit.formData.type || '',
-    })
+    if(nextProps.roleEdit.formData.type){
+      this.setState({
+        organizationFilter:nextProps.roleEdit.organization,
+        roleType:nextProps.roleEdit.formData.type || '',
+      })
+    } else {
+      this.setState({
+        organizationFilter:nextProps.roleEdit.organization,
+      })
+    }
   }
 
   inputUserIDNum = (e)=>{
@@ -87,7 +92,6 @@ export default class RoleEdit extends Component {
 
   handleChangeRoleType = (value)=>{
     const { dispatch } = this.props
-
     this.setState({
       roleType:value
     })
