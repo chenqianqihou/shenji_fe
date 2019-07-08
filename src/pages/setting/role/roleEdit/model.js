@@ -65,7 +65,7 @@ const Model = {
     },
 
     *submitForm({ payload }, { call, put }) {
-      const response 
+      let response 
       const query = getUrlParams()
       const { account } = query
 
