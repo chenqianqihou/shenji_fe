@@ -205,7 +205,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="获取专业技术资质日期">
             {getFieldDecorator(`qualification_time_${i}`, {
-              initialValue:qualification[i] && qualification[i].time ? moment(qualification[i].time): null,
+              initialValue:qualification[i] && qualification[i].time ? moment(qualification[i].time  * 1000): null,
               rules:[
                 {
                   validator: (rule, value, callback) => {
@@ -329,13 +329,13 @@ export default class RoleEdit extends Component {
 
             <Form.Item label="参加工作年月" hasFeedback>
               {getFieldDecorator('workbegin', {
-                initialValue:formData.workbegin?moment(formData.workbegin):null
+                initialValue:formData.workbegin?moment(formData.workbegin * 1000):null
               })( <DatePicker allowClear={false}/>)}
             </Form.Item>
 
             <Form.Item label="参加审计年月" hasFeedback>
               {getFieldDecorator('auditbegin', {
-                initialValue:formData.auditbegin?moment(formData.auditbegin):null
+                initialValue:formData.auditbegin?moment(formData.auditbegin * 1000):null
               })( <DatePicker allowClear={false}/>)}
             </Form.Item>
             
@@ -358,7 +358,7 @@ export default class RoleEdit extends Component {
 
             <Form.Item label="开始从业日期" hasFeedback>
               {getFieldDecorator('workbegin', {
-                initialValue:formData.workbegin?moment(formData.workbegin):null,
+                initialValue:formData.workbegin?moment(formData.workbegin * 1000):null,
                 rules:[
                   { type: 'object',required: true, message: '请选择开始从业日期!' },
                 ]
@@ -454,7 +454,7 @@ export default class RoleEdit extends Component {
 
           <Form.Item label="出生年月" hasFeedback>
             {getFieldDecorator('birthday', {
-              initialValue:formData.cardid?moment(UserId2Birthday(formData.cardid)):null,
+              initialValue:formData.cardid?moment(UserId2Birthday(formData.cardid * 1000)):null,
               rules: [
                 { type: 'object',required: true, message: '请选择出生年月!' },
               ],
