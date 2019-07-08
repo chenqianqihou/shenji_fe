@@ -2,7 +2,7 @@ import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
 import {Modal} from 'antd'
-import { getUserRoleOptions,getProvincialOptions,getFormAdd,getOrganization ,getFormData} from './service';
+import { getUserRoleOptions,getProvincialOptions,getFormAdd,getOrganization ,getFormData,getFormUpload} from './service';
 import { getUrlParams } from '../../../../utils/url';
 
 const Model = {
