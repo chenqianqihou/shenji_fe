@@ -117,6 +117,12 @@ export default {
           icon: 'home',
           component: './index/Index',
         },
+        { 
+          path: '/role/center', 
+          name: '个人中心', 
+          component: './center' ,
+          hideInMenu:true,
+        },
         {
           path: '/project',
           name: 'project',
