@@ -1,23 +1,23 @@
 import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
-import {Modal} from 'antd'
-import { getUserRoleOptions,getProvincialOptions,getFormAdd,getOrganization ,getFormData} from './service';
-import { getUrlParams } from '../../../utils/url';
+import { getUserRoleOptions ,getProvincialOptions,getFormData,getOrganization} from './service';
+import { getUrlParams } from '../../../../utils/url';
+
+const query = getUrlParams()
 
 const Model = {
-  namespace: 'roleEdit',
+  namespace: 'mechanismShow',
 
   state: {
     options: {},
-    provincial:{},
     formData:{},
+    provincial:{},
     organization:[]
   },
-
+ 
   effects: {
     *getOptions({ payload }, { call, put }) {
-      const query = getUrlParams()
       const { account } = query
       const response = yield call(getUserRoleOptions, payload)
       const provincialResponse = yield call(getProvincialOptions,payload)
@@ -42,20 +42,12 @@ const Model = {
           },
         });
       }
-
-    },
-    *getOrganization({ payload }, { call, put }){
-      const organization = yield call(getOrganization,payload)
-      yield put({
-        type: 'setState',
-        payload: {
-          organization:organization.data && organization.data.list || []
-        },
-      });
+      
     },
 
     *getFormData({ payload }, { call, put }) {
       const response = yield call(getFormData, payload)
+
       yield put({
         type: 'setState',
         payload: {
@@ -63,24 +55,6 @@ const Model = {
         },
       });
     },
-
-    *submitForm({ payload }, { call, put }) {
-      const response = yield call(getFormAdd, payload)
-      if(response.error.returnCode === 0){
-        Modal.success({
-          title:'提示',
-          content:'保存成功',
-          onOk:()=>{
-            window.history.back()
-          }
-        })
-      } else {
-        Modal.error({
-          title:'保存失败',
-          content:response.error.returnUserMessage,
-        })
-      }
-    }
   },
 
   reducers: {

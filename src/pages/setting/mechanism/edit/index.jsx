@@ -3,17 +3,17 @@ import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Input, Form, Select,DatePicker ,InputNumber,Button} from 'antd';
 import moment from 'moment'
-import { cardValid, UserId2Birthday,UserId2Age,UserId2Sex } from '../../../utils/form';
+import { cardValid, UserId2Birthday,UserId2Age,UserId2Sex } from '../../../../utils/form';
 import styles from './index.less';
 
 const TextArea = Input.TextArea
 
 // eslint-disable-next-line react/prefer-stateless-function
 @Form.create()
-@connect(({roleEdit}) => ({
-  roleEdit,
+@connect(({mechanismEdit}) => ({
+  mechanismEdit,
 }))
-export default class RoleEdit extends Component {
+export default class MechanismEdit extends Component {
   state= {
     disabled:this.props.roleEdit.formData.cardid?true:false,
     roleType:this.props.roleEdit.formData.type || '',

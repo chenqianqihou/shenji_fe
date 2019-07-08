@@ -157,7 +157,7 @@ export default class RoleShowFileds extends Component {
     const {roleShow:{formData,options,provincial}} = this.props
     switch(parseInt(formData.type)){
       //审计机关
-      case 1:
+      case 3:
         return [
           {
             title:'所属部门',
@@ -216,8 +216,8 @@ export default class RoleShowFileds extends Component {
         ]
       //内审机构
       //中介机构
-      case 3:
       case 2:
+      case 1:
         return [
           {
             title:'所属机构',

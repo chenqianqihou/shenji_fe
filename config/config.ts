@@ -188,14 +188,28 @@ export default {
             {
               path: '/setting/roleEdit',
               name: 'roleEdit',
-              component: './setting/roleEdit',
+              component: './setting/role/roleEdit',
               hideInMenu:true,
             },
             //人员信息展示
             {
               path: '/setting/roleShow',
               name: 'roleShow',
-              component: './setting/roleShow',
+              component: './setting/role/roleShow',
+              hideInMenu:true,
+            },
+            //机构新建，修改
+            {
+              path: '/setting/mechanism/edit',
+              name: 'mechanismEdit',
+              component: './setting/mechanism/edit',
+              hideInMenu:true,
+            },
+            //机构展示
+            {
+              path: '/setting/mechanism/show',
+              name: 'mechanismShow',
+              component: './setting/mechanism/show',
               hideInMenu:true,
             },
           ],
