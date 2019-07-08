@@ -106,8 +106,7 @@ export default class RoleSetting extends Component {
   }
 
   onTreeNodeSelect = key => {
-    this.setState({ selectedOrgId: +key[0] });
-    this.getUserListByOrg(key);
+    this.setState({ selectedOrgId: +key[0] }, () => this.queryUsers());
   }
 
   handleItemDel = e => {
