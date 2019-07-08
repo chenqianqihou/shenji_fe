@@ -54,6 +54,8 @@ export default {
   'menu.setting.role': '人员配置',
   'menu.setting.roleEdit':'人员信息录入',
   'menu.setting.roleShow':'人员基本信息',
+  "menu.setting.mechanismEdit":'机构录入',
+  "menu.setting.mechanismShow":'机构展示',
   'menu.setting.assign': '人员分配',
   'menu.setting.check': '审核管理',
   'menu.index': 'Dashboard',
