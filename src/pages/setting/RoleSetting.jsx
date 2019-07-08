@@ -63,9 +63,18 @@ export default class RoleSetting extends Component {
   formateProvincial = code => {
     const location = code ? code.split(',') : [];
     let value = '';
-    if (location[0]) value += provincial[100000][location[0]] ? `${provincial[100000][location[0]]}，` : '';
-    if (location[1]) value += provincial[location[0]][location[1]] ? `${provincial[location[0]][location[1]]}，` : '';
-    if (location[2]) value += provincial[location[1]][location[2]] ? `${provincial[location[1]][location[2]]}，` : '';
+    if (location.length !== 3) {
+      value = code;
+    } else {
+      try {
+        if (location[0]) value += provincial[100000][location[0]] ? `${provincial[100000][location[0]]}，` : '';
+        if (location[1]) value += provincial[location[0]][location[1]] ? `${provincial[location[0]][location[1]]}，` : '';
+        if (location[2]) value += provincial[location[1]][location[2]] ? `${provincial[location[1]][location[2]]}，` : '';
+      } catch {
+        console.log('城市转换错误');
+        value = '城市编码错误';
+      }
+    }
     return value;
   }
 
@@ -225,9 +234,9 @@ export default class RoleSetting extends Component {
       { title: '姓名', dataIndex: 'name' },
       { title: '人员ID', dataIndex: 'pid' },
       { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
-      { title: '人员类型', dataIndex: 'type', render: text => typeMap[text] },
-      { title: '能力等级', dataIndex: 'level', render: text => levelMap[text] },
-      { title: '所属省市区', dataIndex: 'location', render: text => this.formateProvincial(text) },
+      { title: '人员类型', dataIndex: 'type', render: text => text && typeMap[text] },
+      { title: '能力等级', dataIndex: 'level', render: text => text && levelMap[text] },
+      { title: '所属省市区', dataIndex: 'location', render: text => text && this.formateProvincial(text) },
       { title: '操作',
         dataIndex: 'manage',
         render: (text, record, index) => <span>
