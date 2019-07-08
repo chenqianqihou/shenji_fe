@@ -7,7 +7,6 @@ import { formatMessage } from 'umi-plugin-react/locale';
 
 import SelectLang from '@/components/SelectLang';
 import { ConnectProps, ConnectState } from '@/models/connect';
-import logo from '../assets/logo.svg';
 import styles from './UserLayout.less';
 
 export interface UserLayoutProps extends ConnectProps {
@@ -46,8 +45,7 @@ const UserLayout: React.SFC<UserLayoutProps> = props => {
           <div className={styles.top}>
             <div className={styles.header}>
               <Link to="/">
-                <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>审计人员管理系统</span>
+                <span className={styles.title}>审计资源管理平台</span>
               </Link>
             </div>
             <div className={styles.desc}></div>

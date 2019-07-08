@@ -11,8 +11,8 @@ const { Content, Sider } = Layout;
 const { Option } = Select;
 const treeMapType = {
   1: '中介机构',
-  2: '审计机关',
-  3: '内审机构',
+  2: '内审机构',
+  3: '审计机关',
 };
 // eslint-disable-next-line react/prefer-stateless-function
 export default class RoleSetting extends Component {
@@ -38,6 +38,7 @@ export default class RoleSetting extends Component {
         this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
       }
     });
+    this.queryUsers();
   }
 
   // 树的最外层 三个类型
@@ -64,18 +65,13 @@ export default class RoleSetting extends Component {
   geneChildTreeNode = node => <TreeNode title={node.name} key={node.id} type="child" />;
 
   getUserListByOrg = orgId => {
-    getOrgUsers({ organid: orgId, start: 0, length: 1000 }).then(res => {
-      if (res.error.returnCode === 0) {
-        this.setState({ tableData: res.data.list });
-      }
-    });
+    this.queryUsers();
   }
 
   onTreeNodeSelect = key => {
     this.setState({ selectedOrgId: key });
     this.getUserListByOrg(key);
   }
-
 
   handleItemDel = e => {
     Modal.confirm({
@@ -173,19 +169,27 @@ export default class RoleSetting extends Component {
   }
 
   queryUsers = () => {
-    const { searchInputValue } = this.state;
-    if (searchInputValue) {
-      queryUser({
-        organization: 1,
-        query: searchInputValue,
-        length: 1000,
-        page: 1,
-      }).then(res => {
+    const { searchInputValue, selectedOrgId } = this.state;
+    const params = {
+      query: searchInputValue,
+      length: 1000,
+      page: 1,
+    };
+    if (selectedOrgId < 0) {
+      params.organization = 1;
+    } else if (selectedOrgId < 4 && selectedOrgId >= 0) {
+      params.organization = 2;
+      params.type = selectedOrgId;
+    } else {
+      params.organization = 3;
+      params.organid = selectedOrgId;
+    }
+
+      queryUser(params).then(res => {
         if (res.error.returnCode === 0) {
           this.setState({ tableData: res.data.list });
         }
       });
-    }
   }
 
   render() {
