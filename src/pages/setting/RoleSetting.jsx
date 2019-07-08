@@ -11,8 +11,8 @@ const { Content, Sider } = Layout;
 const { Option } = Select;
 const treeMapType = {
   1: '中介机构',
-  2: '审计机关',
-  3: '内审机构',
+  2: '内审机构',
+  3: '审计机关',
 };
 // eslint-disable-next-line react/prefer-stateless-function
 export default class RoleSetting extends Component {

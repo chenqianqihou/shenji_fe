@@ -158,11 +158,11 @@ export default {
               name: 'role',
               component: './setting/RoleSetting',
             },
-            {
-              path: '/setting/assign',
-              name: 'assign',
-              component: './setting/RoleAssign',
-            },
+            // {
+            //   path: '/setting/assign',
+            //   name: 'assign',
+            //   component: './setting/RoleAssign',
+            // },
             {
               path: '/setting/auth',
               name: 'auth',
