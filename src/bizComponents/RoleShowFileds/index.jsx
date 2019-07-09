@@ -7,8 +7,6 @@ import moment from "moment"
 import styles from './index.less';
 
 
-
-
 @connect(({roleShow}) => ({
   roleShow,
 }))
@@ -24,7 +22,6 @@ export default class RoleShowFileds extends Component {
 
 
   convertData = ()=>{
-    console.log('this.propsthis.props',this.props)
     const {roleShow:{formData={},options,provincial,organization}} = this.props
     const data = [
       {
@@ -115,13 +112,9 @@ export default class RoleShowFileds extends Component {
             value:options.level?options.level[formData.level] : ''
           },
           {
-            title:'所属类型',
+            title:'人员机构',
             value:(()=>{
-              const roleType = {
-                1:"审计机关",
-                2:"内审机构",
-                3:"中介机构"
-              }
+              const roleType = options.type || {}
               return roleType[formData.type] || ''
             })()
           },
