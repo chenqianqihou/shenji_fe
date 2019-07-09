@@ -67,6 +67,7 @@ const Model = {
     },
 
     *submitForm({ payload }, { call, put }) {
+      console.log('aaaaasubmitForm')
       let response 
       const query = getUrlParams()
       const { account } = query

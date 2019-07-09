@@ -45,7 +45,6 @@ export default class RoleShowFileds extends Component {
           {
             title:'出生年月',
             value:(()=>{
-              console.log('UserId2Birthday(formData.cardid)',UserId2Birthday(formData.cardid))
               return UserId2Birthday(formData.cardid)?moment(UserId2Birthday(formData.cardid)).format('YYYY年MM月DD日') : ''
             })()
           },

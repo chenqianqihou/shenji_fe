@@ -125,11 +125,10 @@ export default class RoleEdit extends Component {
   
 
   handleSubmit = e => {
+    const {trainState,qualificationState} = this.state
     const {dispatch} = this.props
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      const {trainState,qualificationState} = this.state
-      
       if (!err) {
         const sendValues = Object.assign({},values)
 
@@ -162,7 +161,7 @@ export default class RoleEdit extends Component {
 
   renderProfessionTechnical(){
     const {professionTechnicalNum,qualificationState} = this.state
-    const { form:{getFieldDecorator},roleEdit:{options,formData} } = this.props;
+    const { form:{getFieldDecorator,getFieldValue},roleEdit:{options,formData} } = this.props;
     const {qualification=[]} = formData
     const dom = []
 
@@ -181,6 +180,7 @@ export default class RoleEdit extends Component {
     }
 
     const handleChangeTime = (moment,index)=>{
+      if(!moment) return
       const newQualification = [].concat(qualificationState)
       if(newQualification[index]){
         newQualification[index].time = moment.unix()
