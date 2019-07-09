@@ -122,6 +122,10 @@ export default class RoleSetting extends Component {
   }
 
   deleteOrgUsers = list => {
+    if (list.length === 0) {
+      message.error('请选择至少一项');
+      return;
+    }
     deleteUsers({ pid: list }).then(res => {
         if (res.error.returnCode === 0) {
           message.success(res.error.returnUserMessage || '操作成功');
@@ -135,6 +139,7 @@ export default class RoleSetting extends Component {
   handleItemAssign = e => {
     const { pid } = e;
     const { assignRoleList } = this.state;
+    // 获取人员配置列表中的 role
     if (assignRoleList.length === 0) {
       getUserConfigSelect().then(res => {
         if (res.error.returnCode === 0) {
