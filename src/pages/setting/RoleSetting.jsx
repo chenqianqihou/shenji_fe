@@ -36,6 +36,7 @@ export default class RoleSetting extends Component {
       orgListTree: [],
       tableData: [],
       selectedItems: [],
+      selectedItemsKeys: [],
       selectedOrgId: -1,
       searchInputValue: '',
       assignModalShow: false,
@@ -51,12 +52,12 @@ export default class RoleSetting extends Component {
         this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
       }
     });
-    this.queryUsers();
 
     getProvincialOptions().then(res => {
       if (res.error.returnCode === 0) {
         provincial = res.data;
       }
+      this.queryUsers();
     });
   }
 
@@ -124,7 +125,7 @@ export default class RoleSetting extends Component {
     deleteUsers({ pid: list }).then(res => {
         if (res.error.returnCode === 0) {
           message.success(res.error.returnUserMessage || '操作成功');
-          this.getUserListByOrg(this.state.selectedOrgId);
+          this.queryUsers();
         } else {
           message.error(res.error.returnUserMessage || '操作失败');
         }
@@ -238,6 +239,8 @@ export default class RoleSetting extends Component {
       { title: '所属省市区', dataIndex: 'location', render: text => text && this.formateProvincial(text) },
       { title: '操作',
         dataIndex: 'manage',
+        fixed: 'right',
+        width: 200,
         render: (text, record, index) => <span>
           <a onClick={() => this.handleItemDel(record)}>删除</a>
           <Divider type="vertical" />
@@ -250,17 +253,13 @@ export default class RoleSetting extends Component {
           <a onClick={() => this.handleItemAssign(record)}>分配角色</a>
         </span> },
     ];
-    const { tableData, orgListTree, assignRoleList, assignRoleMap } = this.state;
+    const { tableData, orgListTree, assignRoleList, assignRoleMap, selectedItemsKeys } = this.state;
 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(selectedRowKeys);
-        this.setState({ selectedItems: selectedRows });
+        this.setState({ selectedItems: selectedRows, selectedItemsKeys: selectedRowKeys });
       },
-      getCheckboxProps: record => ({
-        disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name,
-      }),
+      selectedRowKeys: selectedItemsKeys,
     };
 
     return (
@@ -299,6 +298,7 @@ export default class RoleSetting extends Component {
                 columns={columns}
                 rowSelection={rowSelection}
                 dataSource={tableData}
+                scroll={{ x: 1000 }}
               >
               </Table>
             </Row>

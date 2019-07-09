@@ -100,7 +100,7 @@ class Login extends Component<LoginProps, LoginState> {
 
   render() {
     const { userLogin, submitting } = this.props;
-    const { status, type: loginType } = userLogin;
+    const { status, type: loginType='account' } = userLogin;
     const { type, autoLogin } = this.state;
     return (
       <div className={styles.main}>
@@ -113,7 +113,7 @@ class Login extends Component<LoginProps, LoginState> {
           }}
         >
           <Tab key="account" tab={formatMessage({ id: 'user-login.login.tab-login-credentials' })}>
-            {status === 'error' &&
+            {!status &&
               loginType === 'account' &&
               !submitting &&
               this.renderMessage(
