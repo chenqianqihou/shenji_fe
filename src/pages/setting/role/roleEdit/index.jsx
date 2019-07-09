@@ -481,7 +481,7 @@ export default class RoleEdit extends Component {
                   validator: (rule, value, callback) => {
                     const regMobile = /^0?1[3|4|5|6|8][0-9]\d{8}$/
                     if (!regMobile.test(value)) {
-                      callback('请输入正确的身份证号码!');
+                      callback('请输入正确的手机号码!');
                     }
                     callback();
                   },
