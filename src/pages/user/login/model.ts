@@ -5,7 +5,7 @@ import { AccountLogin } from './service';
 import { getPageQuery, setToken } from '../../../utils/utils';
 
 export interface StateType {
-  status?: 'ok' | 'error';
+  status?: true | false;
   type?: string;
   currentAuthority?: 'user' | 'guest' | 'admin';
   token?: string;
@@ -31,7 +31,7 @@ const Model: ModelType = {
   namespace: 'userLogin',
 
   state: {
-    status: undefined,
+    status: true,
   },
 
   effects: {
@@ -58,6 +58,8 @@ const Model: ModelType = {
             window.location.href = redirect;
             return;
           }
+        }else{
+          window.location.href = '/';
         }
         yield put(routerRedux.replace(redirect || '/'));
       }
@@ -69,7 +71,7 @@ const Model: ModelType = {
       setToken(payload.data.token);
       return {
         ...state,
-        status: payload.status,
+        status: payload.error.returnCode === 0,
         type: payload.type,
       };
     },
