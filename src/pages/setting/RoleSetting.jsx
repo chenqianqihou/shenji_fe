@@ -240,7 +240,7 @@ export default class RoleSetting extends Component {
       { title: '操作',
         dataIndex: 'manage',
         fixed: 'right',
-        width: 200,
+        width: 180,
         render: (text, record, index) => <span>
           <a onClick={() => this.handleItemDel(record)}>删除</a>
           <Divider type="vertical" />
