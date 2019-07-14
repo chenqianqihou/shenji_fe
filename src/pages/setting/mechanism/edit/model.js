@@ -11,7 +11,17 @@ const Model = {
   namespace: 'mechanismEdit',
 
   state: {
-    options: {},
+    options: {
+      otype:{
+        1:'中介结构',
+        2:'内审机关',
+        3:'机关'
+      },
+      qualiaudit:{
+        1:'已审核',
+        2:'未审核'
+      }
+    },
     formData:{},
   },
 
@@ -19,23 +29,23 @@ const Model = {
     *getOptions({ payload }, { call, put }) {
       const query = getUrlParams()
       const { oid } = query
-      const response = yield call(getUserRoleOptions, payload)
+      // const response = yield call(getUserRoleOptions, payload)
       if(oid){
         const formData = yield call(getFormData, {oid:oid})
         yield put({
           type: 'setState',
           payload: {
             formData:formData.data || {},
-            options:response.data || {},
+            // options:response.data || {},
           },
         });
       } else {
-        yield put({
-          type: 'setState',
-          payload: {
-            options:response.data || {},
-          },
-        });
+        // yield put({
+        //   type: 'setState',
+        //   payload: {
+        //     // options:response.data || {},
+        //   },
+        // });
       }
 
     },

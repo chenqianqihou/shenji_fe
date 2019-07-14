@@ -105,7 +105,11 @@ export default class MechanismShow extends Component {
           {
             title:'办公地址',
             value:formData.officenum?provincialName(formData.officenum) +'，'+formData.officeaddress : ''
-          },     
+          }, 
+          {
+            title:'资质审核',
+            value:options.qualiaudit[formData.qualiaudit] || ''
+          },    
         ]
       },
     ]

@@ -347,16 +347,16 @@ export default class MechanismEditEdit extends Component {
             )}
           </Form.Item>
 
-          {/* <Form.Item label="资质审核" hasFeedback>
-            {getFieldDecorator('name', {
-              initialValue:formData.name,
+          <Form.Item label="资质审核" hasFeedback>
+            {getFieldDecorator('qualiaudit', {
+              initialValue:formData.qualiaudit,
               rules: [{ required: true, message: '请选择资质审核!' }],
             })(
               <Select placeholder="请选择资质审核">
-                {this.renderSelectOption(options.education)}
+                {this.renderSelectOption(options.qualiaudit)}
               </Select>
             )}
-          </Form.Item> */}
+          </Form.Item>
 
           <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
             <Button type="primary" htmlType="submit">
