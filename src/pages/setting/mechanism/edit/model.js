@@ -2,7 +2,7 @@ import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
 import {Modal} from 'antd'
-import { getUserRoleOptions,getProvincialOptions,getFormAdd ,
+import { getUserRoleOptions,getFormAdd ,
   getFormData,getFormUpload
 } from './service';
 import { getUrlParams } from '../../../../utils/url';
@@ -18,10 +18,10 @@ const Model = {
   effects: {
     *getOptions({ payload }, { call, put }) {
       const query = getUrlParams()
-      const { account } = query
+      const { oid } = query
       const response = yield call(getUserRoleOptions, payload)
-      if(account){
-        const formData = yield call(getFormData, {account:account})
+      if(oid){
+        const formData = yield call(getFormData, {oid:oid})
         yield put({
           type: 'setState',
           payload: {
@@ -43,9 +43,9 @@ const Model = {
     *submitForm({ payload }, { call, put }) {
       let response 
       const query = getUrlParams()
-      const { account } = query
-      if(account){
-        payload.pid = account
+      const { oid } = query
+      if(oid){
+        payload.oid = oid
         response = yield call(getFormUpload, payload)
       }else{
         response = yield call(getFormAdd, payload)

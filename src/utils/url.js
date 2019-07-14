@@ -30,12 +30,12 @@ export const renderCountyOption = (code)=>{
 export const provincialName = (code)=>{
   if(!code) return ''
   const cityCode = code.split(',')
-  const cityName = []
+  let cityName = []
   try{
     cityName[0] = cityCode[0]?provincialJSON[100000][cityCode[0]]:''
     cityName[1] = cityCode[1]?provincialJSON[100000][cityCode[0]][cityCode[1]]:''
     cityName[2] = cityCode[2]?provincialJSON[100000][cityCode[1]][cityCode[2]]:''
-  }catch(){
+  }catch(err){
     cityName = ['城市编码错误']
   }
   return cityName.join('，')

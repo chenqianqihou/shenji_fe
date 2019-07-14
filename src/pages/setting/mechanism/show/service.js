@@ -5,7 +5,7 @@ export async function getOptions(){
 }
 
 export async function getFormData(params){
-  return request('/api/user/info',{
+  return request('/api/organization/info',{
     method: 'POST',
     data: params
   })

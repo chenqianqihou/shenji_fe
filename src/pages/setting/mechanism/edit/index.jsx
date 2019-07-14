@@ -40,17 +40,17 @@ export default class MechanismEditEdit extends Component {
   //   }
   // }
 
-  handleChangeProvincial = (value,index)=>{
+  handleChangeProvincial = (value,index,props)=>{
     const { form:{getFieldValue,setFieldsValue} } = this.props;
-    const newProvincial = [].concat(getFieldValue('location'))
+    const newProvincial = [].concat(getFieldValue(props))
     newProvincial[index] = value
 
     for(let i = index+1;i<3;i++){
       newProvincial[i] = ''
     }
-    setFieldsValue({
-      location: newProvincial,
-    })
+    const obj = {}
+    obj[props] = newProvincial
+    setFieldsValue(obj)
   }
 
 
@@ -60,6 +60,12 @@ export default class MechanismEditEdit extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const sendValues = Object.assign({},values)
+        const location = formData.location.split(',')
+        const office = formData.office.split(',')
+        sendValues.regnum = location.splice(0,2)
+        sendValues.regaddress = location[3]
+        sendValues.officenum = office.splice(0,2)
+        sendValues.officeaddress = office[3]
 
         dispatch({
           type: 'mechanismEdit/submitForm',
@@ -87,21 +93,26 @@ export default class MechanismEditEdit extends Component {
     const { form:{getFieldDecorator,getFieldValue},
       mechanismEdit:{options, formData} } = this.props;
 
+    formData.location = formData.regnum?formData.regnum+','+formData.regaddress:''
+    formData.office = formData.officenum?formData.officenum+','+formData.officeaddress:''
+
     return (
       <div className={styles["mechanism_contain"]}>
         <PageHeaderWrapper />
         <Form {...formItemLayout} className={styles["me_edit_form"]} onSubmit={this.handleSubmit}>
 
           <Form.Item label="机构类型" hasFeedback>
-            {getFieldDecorator('name', {
-              initialValue:formData.name,
+            {getFieldDecorator('otype', {
+              initialValue:formData.otype,
               rules: [{ required: true, message: '请选择机构类型!' }],
             })(
               <Select placeholder="请选择机构类型">
-                {this.renderSelectOption(options.education)}
+                {this.renderSelectOption(options.otype)}
               </Select>
             )}
           </Form.Item>
+
+          <div className={styles["title"]}>公司背景</div>
 
           <Form.Item label="机构名称" hasFeedback>
             {getFieldDecorator('name', {
@@ -113,8 +124,8 @@ export default class MechanismEditEdit extends Component {
           </Form.Item>
 
           <Form.Item label="法定代表人" hasFeedback>
-            {getFieldDecorator('name', {
-              initialValue:formData.name,
+            {getFieldDecorator('deputy', {
+              initialValue:formData.deputy,
               rules: [
                 { required: true, message: '请输入法定代表人!' },
               ],
@@ -122,11 +133,11 @@ export default class MechanismEditEdit extends Component {
           </Form.Item>
           
           <Form.Item label="注册时间" hasFeedback>
-            {getFieldDecorator('workbegin', {
+            {getFieldDecorator('regtime', {
               rules:[
                 { type: 'object',required: true, message: '请选择注册时间!' },
               ],
-              initialValue:formData.workbegin?moment(formData.workbegin * 1000):null,
+              initialValue:formData.regtime?moment(formData.regtime * 1000):null,
             })( <DatePicker allowClear={false}/>)}
           </Form.Item>
 
@@ -149,26 +160,26 @@ export default class MechanismEditEdit extends Component {
               ],
             })(
               <div>
-                <Select placeholder="请选择" value={getFieldValue('location')[0]} onChange={(value)=>this.handleChangeProvincial(value,0)}>
+                <Select placeholder="请选择" value={getFieldValue('location')[0]} onChange={(value)=>this.handleChangeProvincial(value,0,'location')}>
                   {this.renderSelectOption(renderProvincialOption())}
                 </Select>
 
-                <Select placeholder="请选择" value={getFieldValue('location')[1]} onChange={(value)=>this.handleChangeProvincial(value,1)}>
+                <Select placeholder="请选择" value={getFieldValue('location')[1]} onChange={(value)=>this.handleChangeProvincial(value,1,'location')}>
                   {this.renderSelectOption(renderCityOption(getFieldValue('location')[0]) || {})}
                 </Select>
 
-                <Select placeholder="请选择" value={getFieldValue('location')[2]} onChange={(value)=>this.handleChangeProvincial(value,2)}>
+                <Select placeholder="请选择" value={getFieldValue('location')[2]} onChange={(value)=>this.handleChangeProvincial(value,2,'location')}>
                   {this.renderSelectOption(renderCountyOption(getFieldValue('location')[1])  || {})}
                 </Select>
 
-                <Input value={getFieldValue('location')[4] || ‘’} placeholder="请输入" />
+                <Input value={getFieldValue('location')[4] || ''} placeholder="请输入" />
               </div>
             )}
           </Form.Item>
 
           <Form.Item label="资质类别" hasFeedback>
-            {getFieldDecorator('name', {
-              initialValue:formData.name,
+            {getFieldDecorator('category', {
+              initialValue:formData.category,
               rules: [
                 { required: true, message: '请输入资质类别!' },
               ],
@@ -176,13 +187,15 @@ export default class MechanismEditEdit extends Component {
           </Form.Item>
 
           <Form.Item label="注册资本" hasFeedback>
-            {getFieldDecorator('name', {
-              initialValue:formData.name,
+            {getFieldDecorator('capital', {
+              initialValue:formData.capital,
               rules: [
                 { required: true, message: '请输入注册资本!' },
               ],
             })(<Input placeholder="请输入注册资本" />)}
           </Form.Item>
+
+          <div className={styles["title"]}>基本信息</div>
 
           <Form.Item label="开始从业日期" hasFeedback>
             {getFieldDecorator('workbegin', {
@@ -194,98 +207,100 @@ export default class MechanismEditEdit extends Component {
           </Form.Item>
 
           <Form.Item label="造价工程师" hasFeedback>
-            {getFieldDecorator('input-number', {
-               initialValue: 0,
-               rules:[
+            {getFieldDecorator('costeng', {
+              initialValue: formData.costeng,
+              rules:[
                 { required: true, message: '请输入造价工程师!' },
               ],
             })(
               <InputNumber min={0} />
             )}
-            <span className={styles["unit"]}>(人)</span>
+            <span className={styles["unit"]}>（人）</span>
           </Form.Item>
 
           <Form.Item label="造价师" hasFeedback>
-            {getFieldDecorator('input-number', {
-               initialValue: 0,
-               rules:[
+            {getFieldDecorator('coster', {
+              initialValue: formData.coster,
+              rules:[
                 { required: true, message: '请输入造价师!' },
               ],
             })(
               <InputNumber min={0} />
             )}
-            <span className={styles["unit"]}>(人)</span>
+            <span className={styles["unit"]}>（人）</span>
           </Form.Item>
 
           <Form.Item label="注册会计员" hasFeedback>
-            {getFieldDecorator('input-number', {
-               initialValue: 0,
-               rules:[
+            {getFieldDecorator('accountant', {
+              initialValue: formData.accountant,
+              rules:[
                 { required: true, message: '请输入注册会计员!' },
               ],
             })(
               <InputNumber min={0} />
             )}
-            <span className={styles["unit"]}>(人)</span>
+            <span className={styles["unit"]}>（人）</span>
           </Form.Item>
 
           <Form.Item label="在册专业技术人员总数">
             {getFieldDecorator('input-number', {
-               initialValue: getFieldValue(),
+              initialValue: getFieldValue("costeng")+getFieldValue("coster")+getFieldValue("accountant") || 0,
             })(
               <InputNumber min={0} disabled/>
             )}
-            <span className={styles["unit"]}>(人)</span>
+            <span className={styles["unit"]}>（人）</span>
           </Form.Item>
 
           <Form.Item label="高级职称" hasFeedback>
-            {getFieldDecorator('input-number', {
-              initialValue: 0,
+            {getFieldDecorator('highlevel', {
+              initialValue: formData.highlevel,
               rules:[
                 { required: true, message: '请输入高级职称!' },
               ],
             })(
               <InputNumber min={0} />
             )}
-            <span className={styles["unit"]}>(人)</span>
+            <span className={styles["unit"]}>（人）</span>
           </Form.Item>
 
           <Form.Item label="中级职称" hasFeedback>
-            {getFieldDecorator('input-number', {
-              initialValue: 0,
+            {getFieldDecorator('midlevel', {
+              initialValue: formData.midlevel,
               rules:[
                 { required: true, message: '请输入中级职称!' },
               ],
             })(
               <InputNumber min={0} />
             )}
-            <span className={styles["unit"]}>(人)</span>
+            <span className={styles["unit"]}>（人）</span>
           </Form.Item>
 
           <Form.Item label="有职称人员总数">
             {getFieldDecorator('input-number', {
-              initialValue: getFieldValue(),
+              initialValue: getFieldValue('highlevel')+getFieldValue('midlevel') || 0,
             })(
               <InputNumber min={0} disabled/>
             )}
-            <span className={styles["unit"]}>(人)</span>
+            <span className={styles["unit"]}>（人）</span>
           </Form.Item>
           
           <Form.Item label="聘请退休人员专业" hasFeedback>
-            {getFieldDecorator('name', {
-              initialValue:formData.name,
+            {getFieldDecorator('retiree', {
+              initialValue:formData.retiree,
             })(<Input placeholder="请输入聘请退休人员专业" />)}
           </Form.Item>
 
           <Form.Item label="兼职专业人员" hasFeedback>
-            {getFieldDecorator('name', {
-              initialValue:formData.name,
+            {getFieldDecorator('parttirmers', {
+              initialValue:formData.parttirmers,
             })(<Input placeholder="请输入兼职专业人员" />)}
           </Form.Item>
 
+          <div className={styles["title"]}>联系方式</div>
+
           <Form.Item label="联系人" hasFeedback>
-            {getFieldDecorator('name', {
-              initialValue:formData.name,
+            {getFieldDecorator('contactor', {
+              initialValue:formData.contactor,
               rules: [
                 { required: true, message: '请输入联系人!' },
               ],
@@ -293,8 +308,8 @@ export default class MechanismEditEdit extends Component {
           </Form.Item>
 
           <Form.Item label="联系人电话" hasFeedback>
-            {getFieldDecorator('phone', {
-              initialValue:formData.phone,
+            {getFieldDecorator('contactphone', {
+              initialValue:formData.contactphone,
               rules: [
                 { required: true, message: '请输入联系人电话!' },
                 {
@@ -311,28 +326,28 @@ export default class MechanismEditEdit extends Component {
           </Form.Item>
 
           <Form.Item label="办公地址" required>
-            {getFieldDecorator('location', {
-              initialValue:formData.location?formData.location.split(',') : ['','','',''],
+            {getFieldDecorator('office', {
+              initialValue:formData.office?formData.office.split(',') : ['','','',''],
             })(
               <div>
-                <Select placeholder="请选择" value={getFieldValue('location')[0]} onChange={(value)=>this.handleChangeProvincial(value,0)}>
+                <Select placeholder="请选择" value={getFieldValue('office')[0]} onChange={(value)=>this.handleChangeProvincial(value,0,'office')}>
                   {this.renderSelectOption(renderProvincialOption())}
                 </Select>
 
-                <Select placeholder="请选择" value={getFieldValue('location')[1]} onChange={(value)=>this.handleChangeProvincial(value,1)}>
-                  {this.renderSelectOption(renderCityOption(getFieldValue('location')[0]) || {})}
+                <Select placeholder="请选择" value={getFieldValue('office')[1]} onChange={(value)=>this.handleChangeProvincial(value,1,'office')}>
+                  {this.renderSelectOption(renderCityOption(getFieldValue('office')[0]) || {})}
                 </Select>
 
-                <Select placeholder="请选择" value={getFieldValue('location')[2]} onChange={(value)=>this.handleChangeProvincial(value,2)}>
-                  {this.renderSelectOption(renderCountyOption(getFieldValue('location')[1])  || {})}
+                <Select placeholder="请选择" value={getFieldValue('office')[2]} onChange={(value)=>this.handleChangeProvincial(value,2,'office')}>
+                  {this.renderSelectOption(renderCountyOption(getFieldValue('office')[1])  || {})}
                 </Select>
 
-                <Input value={getFieldValue('location')[4] || ‘’} placeholder="请输入" />
+                <Input value={getFieldValue('office')[4] || ''} placeholder="请输入" />
               </div>
             )}
           </Form.Item>
 
-          <Form.Item label="资质审核" hasFeedback>
+          {/* <Form.Item label="资质审核" hasFeedback>
             {getFieldDecorator('name', {
               initialValue:formData.name,
               rules: [{ required: true, message: '请选择资质审核!' }],
@@ -341,7 +356,7 @@ export default class MechanismEditEdit extends Component {
                 {this.renderSelectOption(options.education)}
               </Select>
             )}
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
             <Button type="primary" htmlType="submit">

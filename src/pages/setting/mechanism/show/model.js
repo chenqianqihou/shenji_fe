@@ -15,10 +15,10 @@ const Model = {
   effects: {
     *getOptions({ payload }, { call, put }) {
       const query = getUrlParams()
-      const { account } = query
+      const { oid } = query
       const response = yield call(getOption, payload)
-      if(account){
-        const formData = yield call(getFormData, {account:account})
+      if(oid){
+        const formData = yield call(getFormData, {oid:oid})
         yield put({
           type: 'setState',
           payload: {
