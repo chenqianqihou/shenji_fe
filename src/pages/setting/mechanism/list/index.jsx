@@ -76,7 +76,7 @@ export default class OrgList extends Component {
 
   // 新增 跳转
   handleAdd = () => {
-
+    router.push('/setting/mechanism/edit');
   }
 
   // 批量导入
