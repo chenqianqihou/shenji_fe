@@ -9,10 +9,7 @@ export async function getProvincialOptions(){
 }
 
 export async function getFormData(params){
-  return request('/api/user/info',{
-    method: 'POST',
-    data: params
-  })
+  return request('/api/user/my')
 }
 
 export async function getOrganization(params){

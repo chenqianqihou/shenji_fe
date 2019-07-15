@@ -22,27 +22,17 @@ const Model = {
       const { account } = query
       const response = yield call(getUserRoleOptions, payload)
       const provincialResponse = yield call(getProvincialOptions,payload)
-      if(account){
-        const formData = yield call(getFormData, {account:account})
-        const organization = yield call(getOrganization,{type:formData.data.type})
-        yield put({
-          type: 'setState',
-          payload: {
-            formData:formData.data || {},
-            options:response.data || {},
-            provincial:provincialResponse.data || {},
-            organization:organization.data && organization.data.list || []
-          },
-        });
-      } else {
-        yield put({
-          type: 'setState',
-          payload: {
-            options:response.data || {},
-            provincial:provincialResponse.data || {}
-          },
-        });
-      }
+      const formData = yield call(getFormData, {account:account})
+      const organization = yield call(getOrganization,{type:formData.data.type})
+      yield put({
+        type: 'setState',
+        payload: {
+          formData:formData.data || {},
+          options:response.data || {},
+          provincial:provincialResponse.data || {},
+          organization:organization.data && organization.data.list || []
+        },
+      });
       
     },
 
