@@ -35,10 +35,10 @@ export default class RoleSetting extends Component {
 
   componentDidMount() {
     getOrgList().then(res => {
-      this.setState({ orgListTree: this.formatOrgListTreeOuter(mockTreeData) });
-      // if (res.error.returnCode === 0) {
-      //   this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
-      // }
+      // this.setState({ orgListTree: this.formatOrgListTreeOuter(mockTreeData) });
+      if (res.error.returnCode === 0) {
+        this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
+      }
     });
 
     getProvincialOptions().then(res => {
