@@ -26,6 +26,7 @@ const Model = {
     *getOptions({ payload }, { call, put }) {
       const query = getUrlParams()
       const { oid } = query
+      console.log('oidoidoid',oid)
       // const response = yield call(getOption, payload)
       if(oid){
         const formData = yield call(getFormData, {oid:oid})
