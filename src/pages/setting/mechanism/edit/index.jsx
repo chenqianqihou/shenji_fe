@@ -1,24 +1,24 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Input, Form, Select,DatePicker ,InputNumber,Button} from 'antd';
-import moment from 'moment'
-import { renderProvincialOption, renderCityOption,renderCountyOption,provincialName } from '../../../../utils/url';
+import { Input, Form, Select, DatePicker, InputNumber, Button } from 'antd';
+import moment from 'moment';
+import { renderProvincialOption, renderCityOption, renderCountyOption, provincialName } from '../../../../utils/url';
 import styles from './index.less';
 
-const TextArea = Input.TextArea
-let roleTypeFlag = true
+const { TextArea } = Input;
+const roleTypeFlag = true;
 // eslint-disable-next-line react/prefer-stateless-function
 @Form.create()
-@connect(({mechanismEdit}) => ({
+@connect(({ mechanismEdit }) => ({
   mechanismEdit,
 }))
 export default class MechanismEditEdit extends Component {
   state= {
-   
+
   }
-  
-  componentDidMount(){
+
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'mechanismEdit/getOptions',
@@ -45,8 +45,8 @@ export default class MechanismEditEdit extends Component {
     const newProvincial = [].concat(getFieldValue(props))
     newProvincial[index] = value
 
-    for(let i = index+1;i<3;i++){
-      newProvincial[i] = ''
+    for (let i = index + 1; i < 3; i++) {
+      newProvincial[i] = '';
     }
     const obj = {}
     obj[props] = newProvincial
@@ -55,7 +55,7 @@ export default class MechanismEditEdit extends Component {
 
 
   handleSubmit = e => {
-    const {dispatch} = this.props
+    const { dispatch } = this.props;
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -69,37 +69,37 @@ export default class MechanismEditEdit extends Component {
 
         dispatch({
           type: 'mechanismEdit/submitForm',
-          payload:{
-            ...sendValues
-          }
+          payload: {
+            ...sendValues,
+          },
         });
       }
     });
   };
 
-  renderSelectOption(options={}){
-    let dom = []
-    Object.keys(options).forEach(key=>{
-      dom.push(<Select.Option value={key}>{options[key]}</Select.Option>)
-    })
-    return dom
+  renderSelectOption(options = {}) {
+    const dom = [];
+    Object.keys(options).forEach(key => {
+      dom.push(<Select.Option value={key}>{options[key]}</Select.Option>);
+    });
+    return dom;
   }
 
   render() {
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
-    }
-    const { form:{getFieldDecorator,getFieldValue},
-      mechanismEdit:{options, formData} } = this.props;
+    };
+    const { form: { getFieldDecorator, getFieldValue },
+      mechanismEdit: { options, formData } } = this.props;
 
     formData.location = formData.regnum?formData.regnum+','+formData.regaddress:''
     formData.office = formData.officenum?formData.officenum+','+formData.officeaddress:''
 
     return (
-      <div className={styles["mechanism_contain"]}>
+      <div className={styles.mechanism_contain}>
         <PageHeaderWrapper />
-        <Form {...formItemLayout} className={styles["me_edit_form"]} onSubmit={this.handleSubmit}>
+        <Form {...formItemLayout} className={styles.me_edit_form} onSubmit={this.handleSubmit}>
 
           <Form.Item label="机构类型" hasFeedback>
             {getFieldDecorator('otype', {
@@ -116,7 +116,7 @@ export default class MechanismEditEdit extends Component {
 
           <Form.Item label="机构名称" hasFeedback>
             {getFieldDecorator('name', {
-              initialValue:formData.name,
+              initialValue: formData.name,
               rules: [
                 { required: true, message: '请输入机构名称!' },
               ],
@@ -131,7 +131,7 @@ export default class MechanismEditEdit extends Component {
               ],
             })(<Input placeholder="请输入法定代表人" />)}
           </Form.Item>
-          
+
           <Form.Item label="注册时间" hasFeedback>
             {getFieldDecorator('regtime', {
               rules:[
@@ -143,17 +143,16 @@ export default class MechanismEditEdit extends Component {
 
           <Form.Item label="注册地址" required>
             {getFieldDecorator('location', {
-              initialValue:formData.location?formData.location.split(',') : ['','','',''],
+              initialValue: formData.location ? formData.location.split(',') : ['', '', '', ''],
               rules: [
                 {
                   validator: (rule, value, callback) => {
-                    
-                    for(let i = 0 ;i<3;i++){
+                    for (let i = 0; i < 3; i++) {
                       if (!value[i]) {
                         callback('请选择所属省市区!');
                         break;
                       }
-                    }     
+                    }
                     callback();
                   },
                 },
@@ -199,11 +198,11 @@ export default class MechanismEditEdit extends Component {
 
           <Form.Item label="开始从业日期" hasFeedback>
             {getFieldDecorator('workbegin', {
-              rules:[
-                { type: 'object',required: true, message: '请选择开始从业日期!' },
+              rules: [
+                { type: 'object', required: true, message: '请选择开始从业日期!' },
               ],
-              initialValue:formData.workbegin?moment(formData.workbegin * 1000):null,
-            })( <DatePicker allowClear={false}/>)}
+              initialValue: formData.workbegin ? moment(formData.workbegin * 1000) : null,
+            })(<DatePicker allowClear={false}/>)}
           </Form.Item>
 
           <Form.Item label="造价工程师" hasFeedback>
@@ -213,7 +212,7 @@ export default class MechanismEditEdit extends Component {
                 { required: true, message: '请输入造价工程师!' },
               ],
             })(
-              <InputNumber min={0} />
+              <InputNumber min={0} />,
             )}
             <span className={styles["unit"]}>（人）</span>
           </Form.Item>
@@ -225,7 +224,7 @@ export default class MechanismEditEdit extends Component {
                 { required: true, message: '请输入造价师!' },
               ],
             })(
-              <InputNumber min={0} />
+              <InputNumber min={0} />,
             )}
             <span className={styles["unit"]}>（人）</span>
           </Form.Item>
@@ -237,7 +236,7 @@ export default class MechanismEditEdit extends Component {
                 { required: true, message: '请输入注册会计员!' },
               ],
             })(
-              <InputNumber min={0} />
+              <InputNumber min={0} />,
             )}
             <span className={styles["unit"]}>（人）</span>
           </Form.Item>
@@ -246,7 +245,7 @@ export default class MechanismEditEdit extends Component {
             {getFieldDecorator('input-number', {
               initialValue: getFieldValue("costeng")+getFieldValue("coster")+getFieldValue("accountant") || 0,
             })(
-              <InputNumber min={0} disabled/>
+              <InputNumber min={0} disabled/>,
             )}
             <span className={styles["unit"]}>（人）</span>
           </Form.Item>
@@ -258,7 +257,7 @@ export default class MechanismEditEdit extends Component {
                 { required: true, message: '请输入高级职称!' },
               ],
             })(
-              <InputNumber min={0} />
+              <InputNumber min={0} />,
             )}
             <span className={styles["unit"]}>（人）</span>
           </Form.Item>
@@ -270,7 +269,7 @@ export default class MechanismEditEdit extends Component {
                 { required: true, message: '请输入中级职称!' },
               ],
             })(
-              <InputNumber min={0} />
+              <InputNumber min={0} />,
             )}
             <span className={styles["unit"]}>（人）</span>
           </Form.Item>
@@ -279,11 +278,11 @@ export default class MechanismEditEdit extends Component {
             {getFieldDecorator('input-number', {
               initialValue: getFieldValue('highlevel')+getFieldValue('midlevel') || 0,
             })(
-              <InputNumber min={0} disabled/>
+              <InputNumber min={0} disabled/>,
             )}
             <span className={styles["unit"]}>（人）</span>
           </Form.Item>
-          
+
           <Form.Item label="聘请退休人员专业" hasFeedback>
             {getFieldDecorator('retiree', {
               initialValue:formData.retiree,
@@ -314,7 +313,7 @@ export default class MechanismEditEdit extends Component {
                 { required: true, message: '请输入联系人电话!' },
                 {
                   validator: (rule, value, callback) => {
-                    const regMobile = /^0?1[3|4|5|6|8][0-9]\d{8}$/
+                    const regMobile = /^0?1[3|4|5|6|8][0-9]\d{8}$/;
                     if (!regMobile.test(value)) {
                       callback('请输入正确的手机号码!');
                     }
