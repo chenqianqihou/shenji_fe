@@ -27,29 +27,42 @@ const codeMessage = {
 /**
  * 异常处理程序
  */
-const errorHandler = (error: { response: Response }): void => {
-  const { response } = error;
-  if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
-
-    notification.error({
-      message: `请求错误 ${status}: ${url}`,
-      description: errorText,
-    });
-  }
-};
+// const errorHandler = (error: { response: Response }): void => {
+//   const { returnCode, returnMessage  } = error;
+//   console.log(error);
+//   if(returnCode !== 0){
+//     notification.error({
+//       message: `请求错误 ${returnCode}`,
+//       description: returnMessage,
+//     });
+//   }
+// };
 
 
 /**
  * 配置request请求时的默认参数
  */
 const request = extend({
-  errorHandler, // 默认错误处理
+  // errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
   headers: {
     'AUTHORIZATION': getToken(),
   }
 });
+
+request.interceptors.response.use(async (response) => {
+  const data = await response.clone().json();
+  const {returnCode=0, returnMessage} = data.error
+  if(returnCode === 40100){
+    location.href = '/user/login';
+  }
+  if(data.error.returnCode !== 0){
+    notification.error({
+      message: `请求错误 ${returnCode}`,
+      description: returnMessage,
+    });
+  }
+  return response;
+})
 
 export default request;
