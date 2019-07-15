@@ -177,7 +177,7 @@ export default {
             {
               path: '/setting/org',
               name: 'org',
-              component: './setting/OrgSetting',
+              component: './setting/mechanism/list/index',
             },
             {
               path: '/setting/check',

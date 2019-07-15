@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Input, Form, Select, DatePicker,InputNumber, Button } from 'antd';
+import { Input, Form, Select, DatePicker, InputNumber, Button } from 'antd';
 import moment from 'moment';
 import { renderProvincialOption, renderCityOption, renderCountyOption, provincialName } from '../../../../utils/url';
 import styles from './index.less';
 
-const {TextArea} = Input;
+const { TextArea } = Input;
 const roleTypeFlag = true;
 // eslint-disable-next-line react/prefer-stateless-function
 @Form.create()
@@ -126,7 +126,7 @@ export default class MechanismEditEdit extends Component {
               rules: [
                 { type: 'object', required: true, message: '请选择注册时间!' },
               ],
-              initialValue: formData.workbegin ? moment(formData.workbegin * 1000):null,
+              initialValue: formData.workbegin ? moment(formData.workbegin * 1000) : null,
             })(<DatePicker allowClear={false}/>)}
           </Form.Item>
 
@@ -136,7 +136,7 @@ export default class MechanismEditEdit extends Component {
               rules: [
                 {
                   validator: (rule, value, callback) => {
-                    for (let i = 0 ; i < 3; i++) {
+                    for (let i = 0; i < 3; i++) {
                       if (!value[i]) {
                         callback('请选择所属省市区!');
                         break;
@@ -188,7 +188,7 @@ export default class MechanismEditEdit extends Component {
               rules: [
                 { type: 'object', required: true, message: '请选择开始从业日期!' },
               ],
-              initialValue: formData.workbegin ? moment(formData.workbegin * 1000):null,
+              initialValue: formData.workbegin ? moment(formData.workbegin * 1000) : null,
             })(<DatePicker allowClear={false}/>)}
           </Form.Item>
 

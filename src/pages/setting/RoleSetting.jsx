@@ -5,27 +5,14 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message, Select } from 'antd';
 import router from 'umi/router';
 import { getProvincialOptions, getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
+import { levelMap, typeMap } from '../../utils/conts';
+import { mockTreeData } from '../../utils/mock';
 
 const { TreeNode } = Tree;
 const { Content, Sider } = Layout;
 const { Option } = Select;
-const treeMapType = {
-  1: '中介机构',
-  2: '内审机构',
-  3: '审计机关',
-};
-const levelMap = {
-  1: 'A',
-  2: 'B',
-  3: 'C',
-  4: 'D',
-};
-const typeMap = {
-  1: '中介机构',
-  2: '内审机构',
-  3: '审计机关',
-};
 let provincial = {};
+
 
 // eslint-disable-next-line react/prefer-stateless-function
 export default class RoleSetting extends Component {
@@ -48,9 +35,10 @@ export default class RoleSetting extends Component {
 
   componentDidMount() {
     getOrgList().then(res => {
-      if (res.error.returnCode === 0) {
-        this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
-      }
+      this.setState({ orgListTree: this.formatOrgListTreeOuter(mockTreeData) });
+      // if (res.error.returnCode === 0) {
+      //   this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
+      // }
     });
 
     getProvincialOptions().then(res => {
@@ -82,7 +70,7 @@ export default class RoleSetting extends Component {
   // 树的最外层 三个类型
   formatOrgListTreeOuter = list =>
     <Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onTreeNodeSelect}>
-      {list.map(v => <TreeNode title={treeMapType[v.type]} key={v.type} type="parent">
+      {list.map(v => <TreeNode title={typeMap[v.type]} key={v.type} type="parent">
         {
           // eslint-disable-next-line max-len
           Array.isArray(v.list) ? v.list.map(value => this.geneChildTreeNode(value)) : this.geneParentTreeNode(v.list)})
@@ -95,12 +83,18 @@ export default class RoleSetting extends Component {
     return keys.map(v =>
       <TreeNode title={data[v].distinct.name} key={v} type="parent">
         {data[v].list.map(value => this.geneChildTreeNode(value))}
+        {data[v].chilren && this.geneParentTreeNode(data[v].chilren) }
       </TreeNode>,
     );
   }
 
   // 构造树的子节点
-  geneChildTreeNode = node => <TreeNode title={node.name} key={node.id} type="child" />;
+  geneChildTreeNode = node => {
+    if (!node.list) {
+      return <TreeNode title={node.name} key={node.id} type="child" />;
+    }
+      return this.geneParentTreeNode(node.list);
+  }
 
   getUserListByOrg = orgId => {
     this.queryUsers();
