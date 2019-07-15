@@ -21,7 +21,7 @@ const Model = {
             const response = yield call(delOrg, payload);
             yield put({
                 type: 'removeOrg',
-                payload: response.data || [],
+                payload,
             });
         },
     },
@@ -34,7 +34,8 @@ const Model = {
             };
         },
 
-        removeOrgs({ payload }) {
+        removeOrgs(state, { payload }) {
+            console.log(payload);
             return {
                 ...payload,
             };

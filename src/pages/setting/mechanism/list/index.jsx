@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Select } from 'antd';
 import { connect } from 'dva';
+import { router } from 'umi';
 import { typeMap } from '../../../../utils/conts';
 
 const { Content } = Layout;
@@ -47,16 +48,19 @@ export default class OrgList extends Component {
   // 单条删除
   handleItemDel = record => {
       console.log(record);
+      this.handleDel([record.id]);
   }
 
   // 修改
   handleItemUpdate = record => {
     console.log(record);
+    router.push(`/setting/mechanism/edit?oid=${record.id}`);
   }
 
   // 查看
   handleItemDetail = record => {
       console.log(record);
+      router.push(`/setting/mechanism/show?oid=${record.id}`);
   }
 
   // 删除多条
