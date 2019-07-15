@@ -13,9 +13,8 @@ const Model = {
   state: {
     options: {
       otype:{
-        1:'中介结构',
-        2:'内审机关',
-        3:'机关'
+        1:'中介机构',
+        2:'内审机构',
       },
       qualiaudit:{
         1:'已审核',
@@ -32,10 +31,13 @@ const Model = {
       // const response = yield call(getUserRoleOptions, payload)
       if(oid){
         const formData = yield call(getFormData, {oid:oid})
+        const data = formData.data || {}
+        data.location = data.regnum?data.regnum+','+data.regaddress:''
+        data.office = data.officenum?data.officenum+','+data.officeaddress:''
         yield put({
           type: 'setState',
           payload: {
-            formData:formData.data || {},
+            formData:data
             // options:response.data || {},
           },
         });

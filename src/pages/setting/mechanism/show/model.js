@@ -10,9 +10,8 @@ const Model = {
   state: {
     options: {
       otype:{
-        1:'中介结构',
-        2:'内审机关',
-        3:'机关'
+        1:'中介机构',
+        2:'内审机构',
       },
       qualiaudit:{
         1:'已审核',
