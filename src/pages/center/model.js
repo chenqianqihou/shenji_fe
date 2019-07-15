@@ -22,7 +22,7 @@ const Model = {
       const { account } = query
       const response = yield call(getUserRoleOptions, payload)
       const provincialResponse = yield call(getProvincialOptions,payload)
-      const formData = yield call(getFormData, {account:account})
+      const formData = yield call(getFormData)
       const organization = yield call(getOrganization,{type:formData.data.type})
       yield put({
         type: 'setState',
