@@ -46,6 +46,10 @@ export default class MechanismShow extends Component {
             value:formData.category || ''
           },
           {
+            title:'资质等级',
+            value:formData.level || ''
+          },
+          {
             title:'注册资本',
             value:formData.capital || ''
           },
@@ -63,11 +67,11 @@ export default class MechanismShow extends Component {
             value:formData.costeng || ''
           },
           {
-            title:'造价师',
+            title:'造价员',
             value:formData.coster || ''
           },
           {
-            title:'注册会计员',
+            title:'注册会计师',
             value:formData.accountant || ''
           },
           {
@@ -108,15 +112,24 @@ export default class MechanismShow extends Component {
             value:formData.contactphone || ''
           },
           {
+            title:'联系电话',
+            value:formData.contactnumber || ''
+          },
+          {
             title:'办公地址',
             value:formData.officenum?provincialName(formData.officenum) +'，'+formData.officeaddress : ''
-          }, 
-          {
-            title:'资质审核',
-            value:options.qualiaudit[formData.qualiaudit] || ''
           },    
         ]
       },
+      {
+        title:'审核情况',
+        rows:[
+          {
+            title:'资质审核',
+            value:options.qualiaudit[formData.qualiaudit] || ''
+          }, 
+        ]
+      }
     ]
     return data
   }
