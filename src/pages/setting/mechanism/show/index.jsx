@@ -12,6 +12,11 @@ import {provincialName } from '../../../../utils/url';
 export default class MechanismShow extends Component {
 
   componentDidMount(){
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'mechanismShow/getOptions',
+    })
   }
 
   convertData = ()=>{
