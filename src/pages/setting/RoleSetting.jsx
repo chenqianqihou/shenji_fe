@@ -37,7 +37,11 @@ export default class RoleSetting extends Component {
     getOrgList().then(res => {
       // this.setState({ orgListTree: this.formatOrgListTreeOuter(mockTreeData) });
       if (res.error.returnCode === 0) {
-        this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
+        try {
+          this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
+        } catch {
+          console.log('error');
+        }
       }
     });
 

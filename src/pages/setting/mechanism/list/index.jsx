@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Select } from 'antd';
+import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Select, Modal } from 'antd';
 import { connect } from 'dva';
 import { router } from 'umi';
 import { typeMap } from '../../../../utils/conts';
@@ -47,30 +47,35 @@ export default class OrgList extends Component {
 
   // 单条删除
   handleItemDel = record => {
-      console.log(record);
       this.handleDel([record.id]);
   }
 
   // 修改
   handleItemUpdate = record => {
-    console.log(record);
     router.push(`/setting/mechanism/edit?oid=${record.id}`);
   }
 
   // 查看
   handleItemDetail = record => {
-      console.log(record);
       router.push(`/setting/mechanism/show?oid=${record.id}`);
   }
 
   // 删除多条
   handleDel = list => {
-    const { dispatch } = this.props;
-    dispatch({
-        type: 'orgList/removeOrgs',
-        payload: {
-            oid: list,
-        },
+    Modal.confirm({
+      title: '确定要删除该机构？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'orgList/removeOrgs',
+            payload: {
+                oid: list || this.state.selectedItems,
+            },
+            callback: this.getTableData,
+        });
+      },
     });
   }
 
@@ -119,7 +124,7 @@ export default class OrgList extends Component {
         onChange: (selectedRowKeys, selectedRows) => {
             this.setState({ selectedRowKeys, selectedItems: selectedRows.map(v => v.id) });
         },
-        selectedRowKeys: this.state.selectedRowKeys,
+        // selectedRowKeys: this.state.selectedRowKeys,
     };
 
     return (
@@ -141,7 +146,6 @@ export default class OrgList extends Component {
                         {
                             typeMapKeys.map(v => <Option key={v} value={v}>{typeMap[v]}</Option>)
                         }
-
                     </Select>
                 </Col>
               <Col span={6}>

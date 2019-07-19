@@ -58,8 +58,8 @@ request.interceptors.response.use(async (response) => {
   }
   if(data.error.returnCode !== 0){
     notification.error({
-      message: `请求错误 ${returnCode}`,
-      description: returnMessage,
+      message: returnMessage,
+      // description: returnMessage,
     });
   }
   return response;
