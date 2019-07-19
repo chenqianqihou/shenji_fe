@@ -13,6 +13,12 @@ const { Content, Sider } = Layout;
 const { Option } = Select;
 let provincial = {};
 
+const getObjectValues = obj => {
+  if (obj !== undefined && obj !== null && !Array.isArray(obj)) {
+    return Object.values(obj);
+  }
+  return [];
+};
 
 // eslint-disable-next-line react/prefer-stateless-function
 export default class RoleSetting extends Component {
@@ -39,8 +45,8 @@ export default class RoleSetting extends Component {
       if (res.error.returnCode === 0) {
         try {
           this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
-        } catch {
-          console.log('error');
+        } catch (e) {
+          console.log('error', e);
         }
       }
     });
@@ -72,33 +78,34 @@ export default class RoleSetting extends Component {
   }
 
   // 树的最外层 三个类型
-  formatOrgListTreeOuter = list =>
-    <Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onTreeNodeSelect}>
-      {list.map(v => <TreeNode title={typeMap[v.type]} key={v.type} type="parent">
-        {
-          // eslint-disable-next-line max-len
-          Array.isArray(v.list) ? v.list.map(value => this.geneChildTreeNode(value)) : this.geneParentTreeNode(v.list)})
-      </TreeNode>)}
+  formatOrgListTreeOuter = data => <Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onTreeNodeSelect}>
+
+      {
+        data.map(v => {
+          const childList = getObjectValues(v.list.list);
+          console.log(childList);
+          return <TreeNode title={typeMap[v.type]} key={v.type} type="parent">
+            {childList.map(value => (value.type === 'parent' ? this.geneParentNode(value) : this.geneChildNode(value)))}
+          </TreeNode>;
+        })
+      }
     </Tree>
 
+
   // 构造树的父亲节点
-  geneParentTreeNode = data => {
-    const keys = Object.keys(data);
-    return keys.map(v =>
-      <TreeNode title={data[v].distinct.name} key={v} type="parent">
-        {data[v].list.map(value => this.geneChildTreeNode(value))}
-        {data[v].chilren && this.geneParentTreeNode(data[v].chilren) }
-      </TreeNode>,
-    );
+  geneParentNode = data => {
+    // 自己的列表
+    const list = getObjectValues(data.list);
+    return <TreeNode title={data.name} key={data.id} type={data.type}>
+        {
+          list.map(v => (v.type === 'parent' ? this.geneParentNode(v) : this.geneChildNode(v)))
+        }
+    </TreeNode>;
   }
 
   // 构造树的子节点
-  geneChildTreeNode = node => {
-    if (!node.list) {
-      return <TreeNode title={node.name} key={node.id} type="child" />;
-    }
-      return this.geneParentTreeNode(node.list);
-  }
+  geneChildNode = node => <TreeNode title={node.name} key={node.id} type="child" />
+
 
   getUserListByOrg = orgId => {
     this.queryUsers();
