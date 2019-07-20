@@ -6,7 +6,10 @@ export async function getOrgList(params) {
     return request('/api/organization/search', { params });
 }
 
-// 删除（批量）
+/**
+ * 批量删除
+ * @param {*} params {oid: []}
+ */
 export async function delOrg(params) {
     return request('/api/organization/delete', {
         method: 'POST',
@@ -17,4 +20,27 @@ export async function delOrg(params) {
 // 批量导入 ？？？
 export async function addMulti() {
     return request('/api/organization/multiadd');
+}
+
+
+/**
+ * 快速新增机构，用于树节点操作
+ * @param {object} params {"pid":"1016","name":"asdfsadf"}
+ */
+export async function quickAddOrg(params) {
+    return request('/api/organization/addbyname', {
+        method: 'POST',
+        data: params,
+    });
+}
+
+/**
+ * 快速修改机构，
+ * @param {object} params {id: 111, name: 'qwqwe'}
+ */
+export async function quickEditOrg(params) {
+    return request('/api/organization/update', {
+        method: 'POST',
+        data: params,
+    });
 }

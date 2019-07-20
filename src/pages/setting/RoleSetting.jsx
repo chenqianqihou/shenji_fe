@@ -4,14 +4,15 @@ import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message, Select } from 'antd';
 import router from 'umi/router';
-import { getProvincialOptions, getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
+import { getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
+import { quickAddOrg, quickEditOrg, delOrg } from './mechanism/list/service';
 import { levelMap, typeMap } from '../../utils/conts';
-import { mockTreeData } from '../../utils/mock';
+import { provincialName } from '../../utils/url';
 
 const { TreeNode } = Tree;
 const { Content, Sider } = Layout;
 const { Option } = Select;
-let provincial = {};
+const provincial = {};
 
 const getObjectValues = obj => {
   if (obj !== undefined && obj !== null && !Array.isArray(obj)) {
@@ -36,12 +37,21 @@ export default class RoleSetting extends Component {
       assignRoleList: [],
       assignRoleMap: {},
       assignRoleSelectPid: '',
+      addOrgDialog: false,
+      addOrgDialogInputValue: '',
+      addOrgDialogPid: 0,
+      addOrgDialogTitle: '',
     };
   }
 
   componentDidMount() {
+    this.initTreeData();
+    this.queryUsers();
+  }
+
+  // 初始化树解构
+  initTreeData = () => {
     getOrgList().then(res => {
-      // this.setState({ orgListTree: this.formatOrgListTreeOuter(mockTreeData) });
       if (res.error.returnCode === 0) {
         try {
           this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
@@ -50,31 +60,6 @@ export default class RoleSetting extends Component {
         }
       }
     });
-
-    getProvincialOptions().then(res => {
-      if (res.error.returnCode === 0) {
-        provincial = res.data;
-      }
-      this.queryUsers();
-    });
-  }
-
-  formateProvincial = code => {
-    const location = code ? code.split(',') : [];
-    let value = '';
-    if (location.length !== 3) {
-      value = code;
-    } else {
-      try {
-        if (location[0]) value += provincial[100000][location[0]] ? `${provincial[100000][location[0]]}，` : '';
-        if (location[1]) value += provincial[location[0]][location[1]] ? `${provincial[location[0]][location[1]]}，` : '';
-        if (location[2]) value += provincial[location[1]][location[2]] ? `${provincial[location[1]][location[2]]}，` : '';
-      } catch {
-        console.log('城市转换错误');
-        value = '城市编码错误';
-      }
-    }
-    return value;
   }
 
   // 树的最外层 三个类型
@@ -83,7 +68,6 @@ export default class RoleSetting extends Component {
       {
         data.map(v => {
           const childList = getObjectValues(v.list.list);
-          console.log(childList);
           return <TreeNode title={typeMap[v.type]} key={v.type} type="parent">
             {childList.map(value => (value.type === 'parent' ? this.geneParentNode(value) : this.geneChildNode(value)))}
           </TreeNode>;
@@ -91,12 +75,11 @@ export default class RoleSetting extends Component {
       }
     </Tree>
 
-
   // 构造树的父亲节点
   geneParentNode = data => {
     // 自己的列表
     const list = getObjectValues(data.list);
-    return <TreeNode title={data.name} key={data.id} type={data.type}>
+    return <TreeNode title={this.nodePro(data)} key={data.id} type={data.type}>
         {
           list.map(v => (v.type === 'parent' ? this.geneParentNode(v) : this.geneChildNode(v)))
         }
@@ -106,6 +89,81 @@ export default class RoleSetting extends Component {
   // 构造树的子节点
   geneChildNode = node => <TreeNode title={node.name} key={node.id} type="child" />
 
+  // 节点的title是自定义的，要有增删改查
+  nodePro = data => <span>
+    {data.name}
+    {data.id < 100000 && <Icon onClick={e => this.handleTreeNodeClick(e, data, 'add')} style={{ marginLeft: '5px' }} type="plus"/>}
+    {data.id < 100000 && <Icon onClick={e => this.handleTreeNodeClick(e, data, 'del')} style={{ marginLeft: '5px' }} type="delete"/>}
+    {data.id < 100000 && <Icon onClick={e => this.handleTreeNodeClick(e, data, 'edit')} style={{ marginLeft: '5px' }} type="edit"/>}
+    </span>
+
+  handleTreeNodeClick = (e, data, type) => {
+    const { id, name } = data;
+
+    if (type === 'add') {
+      this.setState({ addOrgDialog: true, addOrgDialogPid: id, addOrgDialogTitle: '新增机构' });
+    } else if (type === 'edit') {
+      this.setState({ addOrgDialog: true, addOrgDialogPid: id, addOrgDialogTitle: '修改机构', addOrgDialogInputValue: name });
+    } else if (type === 'del') {
+      Modal.confirm({
+        title: '确定删除该机构？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk: () => {
+          delOrg({ oid: [id] }).then(res => {
+            if (res.error.returnCode === 0) {
+              this.initTreeData();
+              message.success('操作成功');
+            }
+          });
+        },
+      });
+    }
+
+    e.stopPropagation();
+  }
+
+  // 树节点新增机构
+  handleAddOrgDialogSubmit = () => {
+    const { addOrgDialogInputValue, addOrgDialogPid } = this.state;
+
+    if (!addOrgDialogInputValue) {
+      message.error('请输入机构名称');
+      return;
+    }
+
+    quickAddOrg({
+      pid: addOrgDialogPid,
+      name: addOrgDialogInputValue,
+    }).then(res => {
+      if (res.error.returnCode === 0) {
+        message.success('操作成功');
+        this.initTreeData();
+        this.setState({ addOrgDialog: false, addOrgDialogInputValue: '' });
+      }
+    });
+  }
+
+  // 树节更新机构
+  handleEditOrgDialogSubmit = () => {
+    const { addOrgDialogInputValue, addOrgDialogPid } = this.state;
+
+    if (!addOrgDialogInputValue) {
+      message.error('请输入机构名称');
+      return;
+    }
+
+    quickEditOrg({
+      id: addOrgDialogPid,
+      name: addOrgDialogInputValue,
+    }).then(res => {
+      if (res.error.returnCode === 0) {
+        message.success('操作成功');
+        this.initTreeData();
+        this.setState({ addOrgDialog: false, addOrgDialogInputValue: '' });
+      }
+    });
+  }
 
   getUserListByOrg = orgId => {
     this.queryUsers();
@@ -249,7 +307,7 @@ export default class RoleSetting extends Component {
       { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
       { title: '人员类型', dataIndex: 'type', render: text => text && typeMap[text] },
       { title: '能力等级', dataIndex: 'level', render: text => text && levelMap[text] },
-      { title: '所属省市区', dataIndex: 'location', render: text => text && this.formateProvincial(text) },
+      { title: '所属省市区', dataIndex: 'location', render: text => text && provincialName(text) },
       { title: '操作',
         dataIndex: 'manage',
         fixed: 'right',
@@ -266,7 +324,7 @@ export default class RoleSetting extends Component {
           <a onClick={() => this.handleItemAssign(record)}>分配角色</a>
         </span> },
     ];
-    const { tableData, orgListTree, assignRoleList, assignRoleMap, selectedItemsKeys } = this.state;
+    const { tableData, orgListTree, assignRoleList, assignRoleMap, selectedItemsKeys, addOrgDialogTitle } = this.state;
 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
@@ -281,7 +339,7 @@ export default class RoleSetting extends Component {
         <Content style={{ margin: '20px 0', background: '#FFF', padding: '20px' }}>
         <Row>
           <Col span={4}>
-            <Sider style={{ background: '#fff', borderRight: '1px solid #CCC' }}>
+            <Sider style={{ background: '#fff' }}>
               {orgListTree}
             </Sider>
           </Col>
@@ -334,6 +392,14 @@ export default class RoleSetting extends Component {
 
             }
           </Select>
+        </Modal>
+        <Modal
+          title={addOrgDialogTitle}
+          visible={this.state.addOrgDialog}
+          onCancel={() => this.setState({ addOrgDialog: false })}
+          onOk={addOrgDialogTitle === '新增机构' ? this.handleAddOrgDialogSubmit : this.handleEditOrgDialogSubmit}
+        >
+          <Input placeholder="请输入机构名称" value={this.state.addOrgDialogInputValue} onChange={e => this.setState({ addOrgDialogInputValue: e.target.value })} />
         </Modal>
         </Content>
       </div>
