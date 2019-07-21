@@ -124,10 +124,25 @@ export default {
           hideInMenu:true,
         },
         {
+          //项目管理
           path: '/project',
           name: 'project',
           icon: 'project',
-          component: './project/ProjectManage',
+          // component: './project/ProjectManage',
+          routes: [
+            //项目管理详情
+            {
+              path: '/project/detail',
+              name: 'projectDetail',
+              component: './project/detail',
+            },
+            //项目管理录入
+            {
+              path: '/project/edit',
+              name: 'projectEdit',
+              component: './project/edit',
+            },
+          ]
         },
         {
           path: '/result',

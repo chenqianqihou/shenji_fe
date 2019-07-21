@@ -48,6 +48,8 @@ export default {
   'menu.editor.koni': '拓扑编辑器',
   'menu.role': '审计人员管理',
   'menu.project': '项目管理',
+  'menu.project.projectDetail': '项目详情页',
+  'menu.project.projectEdit': '项目录入页',
   'menu.setting': '配置管理',
   'menu.setting.org': '机构配置',
   'menu.setting.auth': '权限配置',

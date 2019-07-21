@@ -25,13 +25,14 @@ const Model = {
       if(account){
         const formData = yield call(getFormData, {account:account})
         const organization = yield call(getOrganization,{type:formData.data.type})
+
         yield put({
           type: 'setState',
           payload: {
             formData:formData.data || {},
             options:response.data || {},
             provincial:provincialResponse.data || {},
-            organization:organization.data && organization.data.list || []
+            organization:organization.data && organization.data.organlist || []
           },
         });
       } else {
@@ -51,7 +52,7 @@ const Model = {
       yield put({
         type: 'setState',
         payload: {
-          organization:organization.data && organization.data.list || []
+          organization:organization.data && organization.data.organlist || []
         },
       });
     },
@@ -67,7 +68,6 @@ const Model = {
     },
 
     *submitForm({ payload }, { call, put }) {
-      console.log('aaaaasubmitForm')
       let response 
       const query = getUrlParams()
       const { account } = query

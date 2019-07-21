@@ -30,7 +30,7 @@ const Model = {
           formData:formData.data || {},
           options:response.data || {},
           provincial:provincialResponse.data || {},
-          organization:organization.data && organization.data.list || []
+          organization:organization.data && organization.data.organlist || []
         },
       });
       

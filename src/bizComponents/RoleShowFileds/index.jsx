@@ -6,7 +6,7 @@ import { cardValid, UserId2Birthday,UserId2Age,UserId2Sex } from '../../utils/fo
 import moment from "moment"
 import styles from './index.less';
 
-
+let positionOption = []
 @connect(({roleShow}) => ({
   roleShow,
 }))
@@ -107,10 +107,10 @@ export default class RoleShowFileds extends Component {
               return value
             })()
           },
-          {
-            title:'能力等级',
-            value:options.level?options.level[formData.level] : ''
-          },
+          // {
+          //   title:'能力等级',
+          //   value:options.level?options.level[formData.level] : ''
+          // },
           {
             title:'人员机构',
             value:(()=>{
@@ -125,6 +125,7 @@ export default class RoleShowFileds extends Component {
               organization.forEach(item=>{
                 if(item.id == formData.organization){
                   value = item.name
+                  positionOption = item.partment
                 }
               })
               return value
@@ -158,13 +159,20 @@ export default class RoleShowFileds extends Component {
 
   renderConvertDeficitData(){
     const {roleShow:{formData,options,provincial}} = this.props
+    let department = ''
+    positionOption.forEach(item=>{
+      const key = Object.keys(item)[0]
+      if(key == formData.department){
+        department = item[key] 
+      }
+    })
     switch(parseInt(formData.type)){
       //审计机关
       case 3:
         return [
           {
             title:'所属部门',
-            value:formData.department || ''
+            value:department
           },
           {
             title:'现任职务',

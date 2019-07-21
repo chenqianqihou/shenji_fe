@@ -23,7 +23,7 @@ export async function getFormUpload(params){
 }
 
 export async function getOrganization(params){
-  return request('/api/organization/search?start=0&length=-1&type='+params.type)
+  return request('/api/project/selectconfig?start=0&length=-1&type='+params.type)
 }
 
 export async function getFormData(params){

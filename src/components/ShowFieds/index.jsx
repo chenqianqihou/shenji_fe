@@ -8,12 +8,12 @@ export default class ShowFields extends Component {
 
 
   render() {
-    const { data } = this.props
+    const { data,hideButtom } = this.props
     return (
       <div className={styles["fields_main"]}>
         {
           data.map(fieldItem=>(
-            <div className={styles["fields_modal"]} key={fieldItem.title}>
+            <div className={hideButtom?"":styles["fields_modal"]} key={fieldItem.title}>
               <div className={styles['title']}>{fieldItem.title}</div>
                 <div className={styles['rows_contain']}>
                 {

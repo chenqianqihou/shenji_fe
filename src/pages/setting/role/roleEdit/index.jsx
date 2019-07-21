@@ -265,18 +265,36 @@ export default class RoleEdit extends Component {
   }
 
   renderDeficitFileds(){
-    const { roleType } = this.state
-    const { form:{getFieldDecorator},roleEdit:{options,formData,organization} } = this.props;
+    const { roleType,organizationFilter } = this.state
+    const { form:{getFieldDecorator,getFieldValue},roleEdit:{options,formData,organization} } = this.props;
+
+    const organizationId = getFieldValue('organization')
+    let positionOption = []
+    organizationFilter.forEach(item=>{
+      if(item.id == organizationId){
+        positionOption = item.partment
+      }
+    })
+
     switch(parseInt(roleType)){
       //审计机关
       case 3:
-        return(
+        return(  
           <div>
             <Form.Item label="所属部门" hasFeedback>
               {getFieldDecorator('department', {
                 initialValue:formData.department,
-                rules: [{ required: true, message: '请输入所属部门!' }],
-              })(<Input placeholder="请输入所属部门"/>)}
+                rules: [{ required: true, message: '请选择所属部门!' }],
+              })(
+                <Select placeholder="请选择所属部门"> 
+                  {
+                    positionOption && positionOption.map(item=>{
+                      const key = Object.keys(item)[0]
+                      return <Select.Option key={key}>{item[key]}</Select.Option>
+                    })
+                  }
+                </Select>
+              )}
             </Form.Item>
 
             <Form.Item label="现任职务" hasFeedback>
@@ -596,7 +614,7 @@ export default class RoleEdit extends Component {
             )}
           </Form.Item>
 
-          <Form.Item label="能力等级" hasFeedback>
+          {/* <Form.Item label="能力等级" hasFeedback>
             {getFieldDecorator('level', {
               initialValue:formData.level,
             })(
@@ -604,7 +622,7 @@ export default class RoleEdit extends Component {
                 {this.renderSelectOption(options.level)}
               </Select>
             )}
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item label="人员类型" hasFeedback>
             {getFieldDecorator('type', {
