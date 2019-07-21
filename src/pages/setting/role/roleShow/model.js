@@ -4,8 +4,6 @@ import { routerRedux } from 'dva/router';
 import { getUserRoleOptions ,getProvincialOptions,getFormData,getOrganization} from './service';
 import { getUrlParams } from '../../../../utils/url';
 
-const query = getUrlParams()
-
 const Model = {
   namespace: 'roleShow',
 
@@ -18,6 +16,7 @@ const Model = {
  
   effects: {
     *getOptions({ payload }, { call, put }) {
+      const query = getUrlParams()
       const { account } = query
       const response = yield call(getUserRoleOptions, payload)
       const provincialResponse = yield call(getProvincialOptions,payload)

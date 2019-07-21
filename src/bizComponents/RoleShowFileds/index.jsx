@@ -14,7 +14,7 @@ export default class RoleShowFileds extends Component {
 
   componentDidMount(){
     const { dispatch } = this.props;
-
+    console.log('componentDidMountcomponentDidMountcomponentDidMount')
     dispatch({
       type: 'roleShow/getOptions',
     });

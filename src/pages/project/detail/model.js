@@ -2,7 +2,9 @@ import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
 import { Modal , message} from 'antd'
-import { getDetailDate ,updateProjectStatus,updateProjectAuditInfo,updateProjectAuditGroup} from './service';
+import { getDetailDate ,updateProjectStatus,updateProjectAuditInfo,updateProjectAuditGroup,
+  updateProjectRole,updateProjectDelete,updateProjectUnlock
+} from './service';
 import { getUrlParams } from '../../../utils/url';
 
 const Model = {
@@ -96,6 +98,48 @@ const Model = {
       const query = getUrlParams()
       const { id } = query
       response = yield call(updateProjectAuditGroup, Object.assign(payload,{id:id}))
+      if(response.error.returnCode === 0){
+        message.success('操作成功')
+        window.location.reload()
+      } else {
+        Modal.error({
+          title:'操作失败',
+          content:response.error.returnUserMessage,
+        })
+      } 
+    },
+    *updateProjectRole({ payload }, { call, put }) {
+      const query = getUrlParams()
+      const { id } = query
+      response = yield call(updateProjectRole, Object.assign(payload,{id:id}))
+      if(response.error.returnCode === 0){
+        message.success('操作成功')
+        window.location.reload()
+      } else {
+        Modal.error({
+          title:'操作失败',
+          content:response.error.returnUserMessage,
+        })
+      } 
+    },
+    *updateProjectDelete({ payload }, { call, put }) {
+      const query = getUrlParams()
+      const { id } = query
+      response = yield call(updateProjectDelete, Object.assign(payload,{id:id}))
+      if(response.error.returnCode === 0){
+        message.success('操作成功')
+        window.location.reload()
+      } else {
+        Modal.error({
+          title:'操作失败',
+          content:response.error.returnUserMessage,
+        })
+      } 
+    },
+    *updateProjectUnlock({ payload }, { call, put }) {
+      const query = getUrlParams()
+      const { id } = query
+      response = yield call(updateProjectUnlock, Object.assign(payload,{id:id}))
       if(response.error.returnCode === 0){
         message.success('操作成功')
         window.location.reload()
