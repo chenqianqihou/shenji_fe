@@ -59,7 +59,7 @@ export default class RoleSetting extends Component {
         console.log(type3Data);
         try {
           this.setState({ 
-            orgListTree: this.formatOrgListTreeOuter(res.data), 
+            orgListTree: this.formatOrgListTreeOuter(res.data, true), 
             orgListTreeType3: this.formatOrgListTreeOuter(type3Data, false)
           });
         } catch (e) {
@@ -76,7 +76,7 @@ export default class RoleSetting extends Component {
         data.map(v => {
           const childList = getObjectValues(v.list.list);
           return <TreeNode title={typeMap[v.type]} key={v.type} type="parent">
-            {childList.map(value => (value.type === 'parent' ? this.geneParentNode(value) : this.geneChildNode(value)))}
+            {childList.map(value => (value.type === 'parent' ? this.geneParentNode(value, pro) : this.geneChildNode(value, pro)))}
           </TreeNode>;
         })
       }
