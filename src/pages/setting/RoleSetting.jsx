@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message, Select } from 'antd';
+import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message, Select, Tabs } from 'antd';
 import router from 'umi/router';
 import { getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
 import { quickAddOrg, quickEditOrg, delOrg } from './mechanism/list/service';
@@ -12,7 +12,7 @@ import { provincialName } from '../../utils/url';
 const { TreeNode } = Tree;
 const { Content, Sider } = Layout;
 const { Option } = Select;
-const provincial = {};
+const { TabPane } = Tabs;
 
 const getObjectValues = obj => {
   if (obj !== undefined && obj !== null && !Array.isArray(obj)) {
@@ -41,6 +41,7 @@ export default class RoleSetting extends Component {
       addOrgDialogInputValue: '',
       addOrgDialogPid: 0,
       addOrgDialogTitle: '',
+      activeTabId: 1,
     };
   }
 
@@ -300,14 +301,19 @@ export default class RoleSetting extends Component {
       });
   }
 
+  handleTabChange = e => {
+    console.log(e);
+  }
+
   render() {
     const columns = [
       { title: '姓名', dataIndex: 'name' },
       { title: '人员ID', dataIndex: 'pid' },
       { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
-      { title: '人员类型', dataIndex: 'type', render: text => text && typeMap[text] },
-      { title: '能力等级', dataIndex: 'level', render: text => text && levelMap[text] },
-      { title: '所属省市区', dataIndex: 'location', render: text => text && provincialName(text) },
+      { title: '所属机构', dataIndex: 'organization' },
+      { title: '所属部门', dataIndex: 'department' },
+      { title: '工作状态', dataIndex: 'status' },
+      { title: '在途项目', dataIndex: 'projectnum' },
       { title: '操作',
         dataIndex: 'manage',
         fixed: 'right',
@@ -322,9 +328,18 @@ export default class RoleSetting extends Component {
           <a onClick={() => this.handleItemResetPwd(record)}>重置密码</a>
           <Divider type="vertical" />
           <a onClick={() => this.handleItemAssign(record)}>分配角色</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.handleItemAssign(record)}>分配项目</a>
         </span> },
     ];
-    const { tableData, orgListTree, assignRoleList, assignRoleMap, selectedItemsKeys, addOrgDialogTitle } = this.state;
+    const {
+      tableData,
+      orgListTree,
+      assignRoleList,
+      assignRoleMap,
+      selectedItemsKeys,
+      addOrgDialogTitle,
+    } = this.state;
 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
@@ -337,44 +352,88 @@ export default class RoleSetting extends Component {
       <div>
         <PageHeaderWrapper />
         <Content style={{ margin: '20px 0', background: '#FFF', padding: '20px' }}>
-        <Row>
-          <Col span={4}>
-            <Sider style={{ background: '#fff' }}>
-              {orgListTree}
-            </Sider>
-          </Col>
-          <Col span={16} style={{ marginLeft: '100px' }}>
-            <Row style={{ display: 'flex', alignItems: 'center' }}>
-              查询条件：
-              <Col span={6} style={{ marginRight: '20px' }}>
-                <Input
-                  placeholder="请输入姓名/人员ID"
-                  value={this.state.searchInputValue}
-                  onChange={e => { this.setState({ searchInputValue: e.target.value }); }}
-                  ></Input>
-                </Col>
-              <Col span={6}>
-                <Button type="primary" onClick={this.queryUsers}>查询</Button>
-                <Button style={{ marginLeft: '20px' }} onClick={() => this.setState({ searchInputValue: '' })}>重置</Button>
+        <Tabs defaultActiveKey="1" onChange={e => this.handleTabChange(e)}>
+          <TabPane tab="审计机关" key="1">
+            <Row>
+              <Col span={4}>
+                <Sider style={{ background: '#fff' }}>
+                  {orgListTree}
+                </Sider>
+              </Col>
+              <Col span={16} style={{ marginLeft: '100px' }}>
+                <Row style={{ display: 'flex', alignItems: 'center' }}>
+                  查询条件：
+                  <Col span={6} style={{ marginRight: '20px' }}>
+                    <Input
+                      placeholder="请输入姓名/人员ID"
+                      value={this.state.searchInputValue}
+                      onChange={e => { this.setState({ searchInputValue: e.target.value }); }}
+                      ></Input>
+                    </Col>
+                  <Col span={6}>
+                    <Button type="primary" onClick={this.queryUsers}>查询</Button>
+                    <Button style={{ marginLeft: '20px' }} onClick={() => this.setState({ searchInputValue: '' })}>重置</Button>
+                  </Col>
+                </Row>
+                <Row style={{ margin: '20px 0' }}>
+                  <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleAdd}><Icon type="plus" />新增人员</Button>
+                  <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleDel}><Icon type="delete" />批量删除</Button>
+                  <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleUpload}><Icon type="upload" />导入人员</Button>
+                  <Button onClick={this.handleDownload} ><Icon type="arrow-down" />下载模板</Button>
+                </Row>
+                <Row>
+                  <Table
+                    columns={columns}
+                    rowSelection={rowSelection}
+                    dataSource={tableData}
+                    scroll={{ x: 1000 }}
+                  >
+                  </Table>
+                </Row>
               </Col>
             </Row>
-            <Row style={{ margin: '20px 0' }}>
-              <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleAdd}><Icon type="plus" />新增人员</Button>
-              <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleDel}><Icon type="delete" />批量删除</Button>
-              <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleUpload}><Icon type="upload" />导入人员</Button>
-              <Button onClick={this.handleDownload} ><Icon type="arrow-down" />下载模板</Button>
+          </TabPane>
+          <TabPane tab="第三方机构" key="2">
+          <Row>
+              <Col span={4}>
+                <Sider style={{ background: '#fff' }}>
+                  {orgListTree}
+                </Sider>
+              </Col>
+              <Col span={16} style={{ marginLeft: '100px' }}>
+                <Row style={{ display: 'flex', alignItems: 'center' }}>
+                  查询条件：
+                  <Col span={6} style={{ marginRight: '20px' }}>
+                    <Input
+                      placeholder="请输入姓名/人员ID"
+                      value={this.state.searchInputValue}
+                      onChange={e => { this.setState({ searchInputValue: e.target.value }); }}
+                      ></Input>
+                    </Col>
+                  <Col span={6}>
+                    <Button type="primary" onClick={this.queryUsers}>查询</Button>
+                    <Button style={{ marginLeft: '20px' }} onClick={() => this.setState({ searchInputValue: '' })}>重置</Button>
+                  </Col>
+                </Row>
+                <Row style={{ margin: '20px 0' }}>
+                  <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleAdd}><Icon type="plus" />新增人员</Button>
+                  <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleDel}><Icon type="delete" />批量删除</Button>
+                  <Button type="primary" style={{ marginRight: '20px' }} onClick={this.handleUpload}><Icon type="upload" />导入人员</Button>
+                  <Button onClick={this.handleDownload} ><Icon type="arrow-down" />下载模板</Button>
+                </Row>
+                <Row>
+                  <Table
+                    columns={columns}
+                    rowSelection={rowSelection}
+                    dataSource={tableData}
+                    scroll={{ x: 1000 }}
+                  >
+                  </Table>
+                </Row>
+              </Col>
             </Row>
-            <Row>
-              <Table
-                columns={columns}
-                rowSelection={rowSelection}
-                dataSource={tableData}
-                scroll={{ x: 1000 }}
-              >
-              </Table>
-            </Row>
-          </Col>
-        </Row>
+          </TabPane>
+        </Tabs>
         <Modal
           title="分配角色"
           visible={this.state.assignModalShow}
