@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message, Select, Tabs } from 'antd';
+import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, message, Select, Tabs, Tag } from 'antd';
 import router from 'umi/router';
 import { getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
 import { quickAddOrg, quickEditOrg, delOrg } from './mechanism/list/service';
@@ -28,6 +28,7 @@ export default class RoleSetting extends Component {
     super(props);
     this.state = {
       orgListTree: [],
+      orgListTreeType3: [], // 第三方机构树结构
       tableData: [],
       selectedItems: [],
       selectedItemsKeys: [],
@@ -54,8 +55,13 @@ export default class RoleSetting extends Component {
   initTreeData = () => {
     getOrgList().then(res => {
       if (res.error.returnCode === 0) {
+        const type3Data = [res.data.pop()];
+        console.log(type3Data);
         try {
-          this.setState({ orgListTree: this.formatOrgListTreeOuter(res.data) });
+          this.setState({ 
+            orgListTree: this.formatOrgListTreeOuter(res.data), 
+            orgListTreeType3: this.formatOrgListTreeOuter(type3Data, false)
+          });
         } catch (e) {
           console.log('error', e);
         }
@@ -64,7 +70,7 @@ export default class RoleSetting extends Component {
   }
 
   // 树的最外层 三个类型
-  formatOrgListTreeOuter = data => <Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onTreeNodeSelect}>
+  formatOrgListTreeOuter = (data, pro) => <Tree showLine onSelect={this.onTreeNodeSelect}>
 
       {
         data.map(v => {
@@ -77,10 +83,10 @@ export default class RoleSetting extends Component {
     </Tree>
 
   // 构造树的父亲节点
-  geneParentNode = data => {
+  geneParentNode = (data, pro) => {
     // 自己的列表
     const list = getObjectValues(data.list);
-    return <TreeNode title={this.nodePro(data)} key={data.id} type={data.type}>
+    return <TreeNode title={pro ? this.nodePro(data) : data.name} key={data.id} type={data.type}>
         {
           list.map(v => (v.type === 'parent' ? this.geneParentNode(v) : this.geneChildNode(v)))
         }
@@ -278,7 +284,7 @@ export default class RoleSetting extends Component {
   }
 
   queryUsers = () => {
-    const { searchInputValue, selectedOrgId } = this.state;
+    const { searchInputValue, selectedOrgId, activeTabId } = this.state;
     const params = {
       query: searchInputValue,
       length: 1000,
@@ -294,6 +300,11 @@ export default class RoleSetting extends Component {
       params.organid = selectedOrgId;
     }
 
+    if(activeTabId === '2' && selectedOrgId < 0){
+      params.organization = 2;
+      params.type = 1;
+    }
+
       queryUser(params).then(res => {
         if (res.error.returnCode === 0) {
           this.setState({ tableData: res.data.list });
@@ -302,7 +313,7 @@ export default class RoleSetting extends Component {
   }
 
   handleTabChange = e => {
-    console.log(e);
+    this.setState({activeTabId: e}, () => this.queryUsers());
   }
 
   render() {
@@ -312,7 +323,7 @@ export default class RoleSetting extends Component {
       { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
       { title: '所属机构', dataIndex: 'organization' },
       { title: '所属部门', dataIndex: 'department' },
-      { title: '工作状态', dataIndex: 'status' },
+      { title: '工作状态', dataIndex: 'status', render: text => text === 1 ? <Tag color="green">在点</Tag> : <Tag color="red">不在点</Tag>},
       { title: '在途项目', dataIndex: 'projectnum' },
       { title: '操作',
         dataIndex: 'manage',
@@ -335,6 +346,7 @@ export default class RoleSetting extends Component {
     const {
       tableData,
       orgListTree,
+      orgListTreeType3,
       assignRoleList,
       assignRoleMap,
       selectedItemsKeys,
@@ -397,7 +409,7 @@ export default class RoleSetting extends Component {
           <Row>
               <Col span={4}>
                 <Sider style={{ background: '#fff' }}>
-                  {orgListTree}
+                  {orgListTreeType3}
                 </Sider>
               </Col>
               <Col span={16} style={{ marginLeft: '100px' }}>
