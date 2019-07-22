@@ -61,9 +61,9 @@ export default class MechanismEditEdit extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const sendValues = Object.assign({},values)
-        const regnum = formData.regnum.join(',')
-        const officenum = formData.officenum.join(',')
-
+        const regnum = sendValues.regnum.join(',')
+        const officenum = sendValues.officenum.join(',')
+        console.log('sendValues',sendValues)
         dispatch({
           type: 'mechanismEdit/submitForm',
           payload: {
@@ -192,13 +192,14 @@ export default class MechanismEditEdit extends Component {
             })(<Input placeholder="请输入资质等级" />)}
           </Form.Item>
 
-          <Form.Item label="注册资本" hasFeedback>
+          <Form.Item label="注册资金（万元）" hasFeedback>
             {getFieldDecorator('capital', {
               initialValue:formData.capital,
               rules: [
                 { required: true, message: '请输入注册资本!' },
               ],
-            })(<Input placeholder="请输入注册资本" />)}
+            })(<InputNumber min={0} />,)}
+              {/* <span className={styles["unit"]}>（万元）</span> */}
           </Form.Item>
 
           <div className={styles["title"]}>基本信息</div>
@@ -212,7 +213,7 @@ export default class MechanismEditEdit extends Component {
             })(<DatePicker allowClear={false}/>)}
           </Form.Item>
 
-          <Form.Item label="造价工程师" hasFeedback>
+          <Form.Item label="造价工程师（人）" hasFeedback>
             {getFieldDecorator('costeng', {
               initialValue: formData.costeng,
               rules:[
@@ -221,10 +222,10 @@ export default class MechanismEditEdit extends Component {
             })(
               <InputNumber min={0} />,
             )}
-            <span className={styles["unit"]}>（人）</span>
+            {/* <span className={styles["unit"]}>（人）</span> */}
           </Form.Item>
 
-          <Form.Item label="造价员" hasFeedback>
+          <Form.Item label="造价员（人）" hasFeedback>
             {getFieldDecorator('coster', {
               initialValue: formData.coster,
               rules:[
@@ -233,10 +234,10 @@ export default class MechanismEditEdit extends Component {
             })(
               <InputNumber min={0} />,
             )}
-            <span className={styles["unit"]}>（人）</span>
+            {/* <span className={styles["unit"]}>（人）</span> */}
           </Form.Item>
 
-          <Form.Item label="注册会计师" hasFeedback>
+          <Form.Item label="注册会计师（人）" hasFeedback>
             {getFieldDecorator('accountant', {
               initialValue: formData.accountant,
               rules:[
@@ -245,19 +246,19 @@ export default class MechanismEditEdit extends Component {
             })(
               <InputNumber min={0} />,
             )}
-            <span className={styles["unit"]}>（人）</span>
+            {/* <span className={styles["unit"]}>（人）</span> */}
           </Form.Item>
 
-          <Form.Item label="在册专业技术人员总数">
+          <Form.Item label="在册专业技术人员总数（人）">
             {getFieldDecorator('input-number', {
               initialValue: getFieldValue("costeng")+getFieldValue("coster")+getFieldValue("accountant") || 0,
             })(
               <InputNumber min={0} disabled/>,
             )}
-            <span className={styles["unit"]}>（人）</span>
+            {/* <span className={styles["unit"]}>（人）</span> */}
           </Form.Item>
 
-          <Form.Item label="高级职称" hasFeedback>
+          <Form.Item label="高级职称（人）" hasFeedback>
             {getFieldDecorator('highlevel', {
               initialValue: formData.highlevel,
               rules:[
@@ -266,10 +267,10 @@ export default class MechanismEditEdit extends Component {
             })(
               <InputNumber min={0} />,
             )}
-            <span className={styles["unit"]}>（人）</span>
+            {/* <span className={styles["unit"]}>（人）</span> */}
           </Form.Item>
 
-          <Form.Item label="中级职称" hasFeedback>
+          <Form.Item label="中级职称（人）" hasFeedback>
             {getFieldDecorator('midlevel', {
               initialValue: formData.midlevel,
               rules:[
@@ -278,16 +279,16 @@ export default class MechanismEditEdit extends Component {
             })(
               <InputNumber min={0} />,
             )}
-            <span className={styles["unit"]}>（人）</span>
+            {/* <span className={styles["unit"]}>（人）</span> */}
           </Form.Item>
 
-          <Form.Item label="有职称人员总数">
+          <Form.Item label="有职称人员总数（人）">
             {getFieldDecorator('input-number', {
               initialValue: getFieldValue('highlevel')+getFieldValue('midlevel') || 0,
             })(
               <InputNumber min={0} disabled/>,
             )}
-            <span className={styles["unit"]}>（人）</span>
+            {/* <span className={styles["unit"]}>（人）</span> */}
           </Form.Item>
 
           <Form.Item label="聘请退休人员专业" hasFeedback>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import moment from 'moment'
-import {Icon,Button,Modal,Table} from 'antd'
+import {Icon,Button,Modal,Table,} from 'antd'
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ShowFields from '../../../components/ShowFieds'
 import styles from './index.less';
@@ -14,7 +14,8 @@ import {provincialName } from '../../../utils/url';
 export default class AuditTeam extends Component {
 
   state = {
-    modalVisible:false
+    visible:false,
+    role:''
   }
   componentDidMount(){
   }
@@ -25,6 +26,21 @@ export default class AuditTeam extends Component {
       payload:{
         operate:key
       }
+    })
+  }
+
+  handleSaveRole = ()=>{
+    dispatch({
+      type: 'projectDetail/updateProjectRole',
+      payload:{
+        operate:key
+      }
+    })
+  }
+
+  onChangeRole = (value)=>{
+    this.setState({
+      role:value
     })
   }
 
@@ -97,11 +113,28 @@ export default class AuditTeam extends Component {
   }
 
   render() {
+    const {visible,role} = this.state
     const {
-      projectDetail:{projectData:{head={},basic={}},projectStatus}} = this.props
+      dispatch,projectDetail:{projectData:{head={},basic={}},projectStatus}} = this.props
     return (
       <div className={styles["audit-team"]}>
         {this.renderAuditGroup()}
+        <Modal
+          title='更换项目角色'
+          visible={visible}
+          onCancel={()=>{
+            this.setState({
+              visible:false
+            })
+          }}
+          onOk={this.handleSaveRole}
+        >
+          <Radio.Group onChange={this.onChangeRole} value={this.state.role}>
+            <Radio value={1}>审计组长</Radio>
+            <Radio value={2}>主审</Radio>
+            <Radio value={3}>审计组员</Radio>
+          </Radio.Group>
+        </Modal>
       </div>
     );
   }

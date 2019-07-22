@@ -18,7 +18,7 @@ const Model = {
       },
       qualiaudit:{
         1:'已审核',
-        2:'未审核'
+        0:'未审核'
       }
     },
     formData:{},
