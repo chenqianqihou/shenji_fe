@@ -61,8 +61,9 @@ export default class MechanismEditEdit extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const sendValues = Object.assign({},values)
-        const regnum = sendValues.regnum.join(',')
-        const officenum = sendValues.officenum.join(',')
+        sendValues.regnum = sendValues.regnum.join(',')
+        sendValues.officenum = sendValues.officenum.join(',')
+        sendValues.regtime = sendValues.regtime.unix()
         console.log('sendValues',sendValues)
         dispatch({
           type: 'mechanismEdit/submitForm',
