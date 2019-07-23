@@ -55,12 +55,12 @@ export default class RoleSetting extends Component {
   initTreeData = () => {
     getOrgList().then(res => {
       if (res.error.returnCode === 0) {
-        const type3Data = [res.data.pop()];
-        console.log(type3Data);
+        const jiguanData = res.data.shift();
+        console.log(jiguanData);
         try {
-          this.setState({ 
-            orgListTree: this.formatOrgListTreeOuter(res.data, true), 
-            orgListTreeType3: this.formatOrgListTreeOuter(type3Data, false)
+          this.setState({
+            orgListTree: this.forMatJiguanTreeOuter(jiguanData, true),
+            orgListTreeType3: this.formatOrgListTreeOuter(res.data, false),
           });
         } catch (e) {
           console.log('error', e);
@@ -82,27 +82,40 @@ export default class RoleSetting extends Component {
       }
     </Tree>
 
+  forMatJiguanTreeOuter = (data, pro) => {
+    const list = getObjectValues(data.list.list);
+   return <Tree showLine onSelect={this.onTreeNodeSelect}>
+      {list.map(v => (v.type === 'parent' ? this.geneParentNode(v, pro) : this.geneChildNode(v, pro)))}
+    </Tree>;
+  }
+
   // 构造树的父亲节点
   geneParentNode = (data, pro) => {
     // 自己的列表
     const list = getObjectValues(data.list);
     return <TreeNode title={pro ? this.nodePro(data) : data.name} key={data.id} type={data.type}>
         {
-          list.map(v => (v.type === 'parent' ? this.geneParentNode(v) : this.geneChildNode(v)))
+          list.map(v => (v.type === 'parent' ? this.geneParentNode(v, pro) : this.geneChildNode(v, pro)))
         }
     </TreeNode>;
   }
 
   // 构造树的子节点
-  geneChildNode = node => <TreeNode title={node.name} key={node.id} type="child" />
+  geneChildNode = (node, pro) => <TreeNode title={pro ? this.nodePro(node) : node.name} key={node.id} type="child" />
 
   // 节点的title是自定义的，要有增删改查
-  nodePro = data => <span>
-    {data.name}
-    {data.id < 100000 && <Icon onClick={e => this.handleTreeNodeClick(e, data, 'add')} style={{ marginLeft: '5px' }} type="plus"/>}
-    {data.id < 100000 && <Icon onClick={e => this.handleTreeNodeClick(e, data, 'del')} style={{ marginLeft: '5px' }} type="delete"/>}
-    {data.id < 100000 && <Icon onClick={e => this.handleTreeNodeClick(e, data, 'edit')} style={{ marginLeft: '5px' }} type="edit"/>}
-    </span>
+  nodePro = node => {
+    const { parentid } = node.data;
+    const hasAdd = parentid && parentid === '0';
+    const hasDelEdit = parentid && parentid !== '0';
+    console.log(node);
+    return <span>
+    {node.name}
+    {hasAdd && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'add')} style={{ marginLeft: '5px' }} type="plus"/>}
+    {hasDelEdit && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'del')} style={{ marginLeft: '5px' }} type="delete"/>}
+    {hasDelEdit && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'edit')} style={{ marginLeft: '5px' }} type="edit"/>}
+    </span>;
+ }
 
   handleTreeNodeClick = (e, data, type) => {
     const { id, name } = data;
@@ -300,7 +313,7 @@ export default class RoleSetting extends Component {
       params.organid = selectedOrgId;
     }
 
-    if(activeTabId === '2' && selectedOrgId < 0){
+    if (activeTabId === '2' && selectedOrgId < 0) {
       params.organization = 2;
       params.type = 1;
     }
@@ -313,7 +326,7 @@ export default class RoleSetting extends Component {
   }
 
   handleTabChange = e => {
-    this.setState({activeTabId: e}, () => this.queryUsers());
+    this.setState({ activeTabId: e }, () => this.queryUsers());
   }
 
   render() {
@@ -323,7 +336,7 @@ export default class RoleSetting extends Component {
       { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
       { title: '所属机构', dataIndex: 'organization' },
       { title: '所属部门', dataIndex: 'department' },
-      { title: '工作状态', dataIndex: 'status', render: text => text === 1 ? <Tag color="green">在点</Tag> : <Tag color="red">不在点</Tag>},
+      { title: '工作状态', dataIndex: 'status', render: text => (text === 1 ? <Tag color="green">在点</Tag> : <Tag color="red">不在点</Tag>) },
       { title: '在途项目', dataIndex: 'projectnum' },
       { title: '操作',
         dataIndex: 'manage',
