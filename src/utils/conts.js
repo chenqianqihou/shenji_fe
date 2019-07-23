@@ -12,3 +12,10 @@ export const typeMap = {
   2: '内审机构',
   3: '审计机关',
 };
+
+// 人员类型
+export const roleMap = {
+  1: '审计机关',
+  2: '内审机构',
+  3: '中介机构',
+};

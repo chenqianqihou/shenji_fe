@@ -6,7 +6,7 @@ import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Modal, mes
 import router from 'umi/router';
 import { getOrgList, resetPwd, deleteUsers, queryUser, getUserConfigSelect, updateUserRole } from '../../services/setting';
 import { quickAddOrg, quickEditOrg, delOrg } from './mechanism/list/service';
-import { levelMap, typeMap } from '../../utils/conts';
+import { levelMap, typeMap, roleMap } from '../../utils/conts';
 import { provincialName } from '../../utils/url';
 
 const { TreeNode } = Tree;
@@ -56,7 +56,6 @@ export default class RoleSetting extends Component {
     getOrgList().then(res => {
       if (res.error.returnCode === 0) {
         const jiguanData = res.data.shift();
-        console.log(jiguanData);
         try {
           this.setState({
             orgListTree: this.forMatJiguanTreeOuter(jiguanData, true),
@@ -105,16 +104,21 @@ export default class RoleSetting extends Component {
 
   // 节点的title是自定义的，要有增删改查
   nodePro = node => {
-    const { parentid } = node.data;
-    const hasAdd = parentid && parentid === '0';
-    const hasDelEdit = parentid && parentid !== '0';
-    console.log(node);
-    return <span>
-    {node.name}
-    {hasAdd && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'add')} style={{ marginLeft: '5px' }} type="plus"/>}
-    {hasDelEdit && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'del')} style={{ marginLeft: '5px' }} type="delete"/>}
-    {hasDelEdit && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'edit')} style={{ marginLeft: '5px' }} type="edit"/>}
-    </span>;
+    let res = <span>{node.name}</span>;
+    try {
+      const { parentid } = node.data;
+      const hasAdd = parentid && parentid === '0';
+      const hasDelEdit = parentid && parentid !== '0';
+      res = <span>
+        {node.name}
+        {hasAdd && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'add')} style={{ marginLeft: '5px' }} type="plus"/>}
+        {hasDelEdit && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'del')} style={{ marginLeft: '5px' }} type="delete"/>}
+        {hasDelEdit && <Icon onClick={e => this.handleTreeNodeClick(e, node, 'edit')} style={{ marginLeft: '5px' }} type="edit"/>}
+      </span>;
+    } catch (e) {
+      console.log(e);
+    }
+    return res;
  }
 
   handleTreeNodeClick = (e, data, type) => {
@@ -215,6 +219,7 @@ export default class RoleSetting extends Component {
     deleteUsers({ pid: list }).then(res => {
         if (res.error.returnCode === 0) {
           message.success(res.error.returnUserMessage || '操作成功');
+          this.setState({ selectedItemsKeys: [] });
           this.queryUsers();
         } else {
           message.error(res.error.returnUserMessage || '操作失败');
@@ -229,7 +234,10 @@ export default class RoleSetting extends Component {
     if (assignRoleList.length === 0) {
       getUserConfigSelect().then(res => {
         if (res.error.returnCode === 0) {
-          this.setState({ assignRoleMap: res.data.role, assignRoleList: Object.keys(res.data.role) });
+          this.setState({
+            assignRoleMap: res.data.role,
+            assignRoleList: Object.keys(res.data.role),
+          });
         }
       });
     }
@@ -330,7 +338,7 @@ export default class RoleSetting extends Component {
   }
 
   render() {
-    const columns = [
+    const columns1 = [
       { title: '姓名', dataIndex: 'name' },
       { title: '人员ID', dataIndex: 'pid' },
       { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
@@ -356,6 +364,35 @@ export default class RoleSetting extends Component {
           <a onClick={() => this.handleItemAssign(record)}>分配项目</a>
         </span> },
     ];
+
+
+    const columns2 = [
+      { title: '姓名', dataIndex: 'name' },
+      { title: '人员ID', dataIndex: 'pid' },
+      { title: '性别', dataIndex: 'sex', render: text => (text === '1' ? '男' : '女') },
+      { title: '人员类型', dataIndex: 'type', render: text => roleMap[text] },
+      { title: '所属机构', dataIndex: 'organization' },
+      { title: '工作状态', dataIndex: 'status', render: text => (text === 1 ? <Tag color="green">在点</Tag> : <Tag color="red">不在点</Tag>) },
+      { title: '在途项目', dataIndex: 'projectnum' },
+      { title: '操作',
+        dataIndex: 'manage',
+        fixed: 'right',
+        width: 180,
+        render: (text, record, index) => <span>
+          <a onClick={() => this.handleItemDel(record)}>删除</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.handleItemUpdate(record)}>编辑</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.handleItemDetail(record)}>详情</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.handleItemResetPwd(record)}>重置密码</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.handleItemAssign(record)}>分配角色</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.handleItemAssign(record)}>分配项目</a>
+        </span> },
+    ];
+
     const {
       tableData,
       orgListTree,
@@ -408,7 +445,7 @@ export default class RoleSetting extends Component {
                 </Row>
                 <Row>
                   <Table
-                    columns={columns}
+                    columns={columns1}
                     rowSelection={rowSelection}
                     dataSource={tableData}
                     scroll={{ x: 1000 }}
@@ -448,7 +485,7 @@ export default class RoleSetting extends Component {
                 </Row>
                 <Row>
                   <Table
-                    columns={columns}
+                    columns={columns2}
                     rowSelection={rowSelection}
                     dataSource={tableData}
                     scroll={{ x: 1000 }}

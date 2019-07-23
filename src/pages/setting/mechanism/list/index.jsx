@@ -2,14 +2,17 @@
 
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Select, Modal } from 'antd';
+import { Tree, Layout, Row, Col, Input, Button, Icon, Table, Divider, Select, Modal, message } from 'antd';
 import { connect } from 'dva';
 import { router } from 'umi';
-import { typeMap } from '../../../../utils/conts';
 
 const { Content } = Layout;
 const { Option } = Select;
 
+const typeMap = {
+  1: '中介机构',
+  2: '内审机构',
+};
 
 @connect(({ orgList }) => ({
     orgList,
@@ -62,6 +65,10 @@ export default class OrgList extends Component {
 
   // 删除多条
   handleDel = list => {
+   if ((list || this.state.selectedItems).length === 0) {
+    message.error('请至少选择一条');
+    return;
+   }
     Modal.confirm({
       title: '确定要删除该机构？',
       okText: '确认',
